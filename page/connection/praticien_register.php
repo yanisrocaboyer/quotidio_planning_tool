@@ -1,53 +1,101 @@
 <?php
 $TITLE = "Quotidio Planning - Connexion";
+$DIPLOMA_LIMIT = 5;
+require_once './functions/connection.php';
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $register_result = register($_POST, $_FILES);
+
+    if ($register_result['success']) {
+        header("Location: ../praticien/inscription_success.php");
+        exit;
+    } else if (!empty($register_result['errors'])) {
+        $form_errors = $register_result['errors'];
+    }
+
+}
 ?>
-<div class="center-box">
-    <div class="con-box-1">
-        <img class="w-80 ml-auto mr-auto" src="/assets/quotidio_big_logo.png" alt="quotidio_big_logo" draggable="false">
-        <div>
-            <h1 class="mt-2 text-2xl text-center text-primary">Inscription praticien·ne</h1>
-            <form class="con-form">
-                <div id="part1">
-                    <div class="mt-2 flex gap-4">
-                        <div class="flex flex-col">
+<div class="min-h-screen flex flex-col justify-center items-center bg-[url('/assets/bg.png')] bg-no-repeat bg-bottom bg-cover py-10">
+    <div class="bg-white w-full max-w-3xl shadow-lg px-10 py-8 mx-2 overflow-auto sm:rounded-xl">
+        <img class="w-64 md:w-80 mx-auto" src="/assets/quotidio_big_logo.png" alt="quotidio_big_logo" draggable="false">
+        <div class="mt-4">
+            <h1 class="mt-2 text-3xl md:text-4xl text-center text-primary">Inscription praticien·ne</h1>
+            <div id="form-global-error" class="text-center text-red-700 text-sm mb-2">
+                <?php 
+                if (!empty($form_errors)) {
+                    echo implode('<br>', array_map('htmlspecialchars', $form_errors));
+                }
+                ?>
+            </div>
+            <div id="form-global-error" class="text-center text-red-700 text-sm mb-2"></div>
+            <form class="con-form flex flex-col items-center justify-center w-full" method="POST" enctype="multipart/form-data" id="praticien-register-form" novalidate>
+                <div id="part1" class="form-part">
+                    <div class="mt-2 flex flex-col md:flex-row gap-4 w-full">
+                        <div class="flex flex-col w-full md:w-1/2">
                             <p>Nom</p>
-                            <input class="input-primary-small" type="text" placeholder="Doe"/>
+                            <input class="input-primary-small" type="text" name="lastname" placeholder="Doe"/>
+                            <span class="input-error text-xs text-red-700"></span>
                         </div>
-                        <div class="flex flex-col">
+                        <div class="flex flex-col w-full md:w-1/2">
                             <p>Prénom</p>
-                            <input class="input-primary-small" type="text" placeholder="John"/>
+                            <input class="input-primary-small" type="text" name="firstname" placeholder="John"/>
+                            <span class="input-error text-xs text-red-700"></span>
                         </div>
                     </div>
-                    <div class="mt-5">
+                    <div class="mt-5 w-full">
                         <p>Email</p>
-                        <input class="input-primary" type="email" placeholder="johndoe@exemple.com"/>
+                        <input class="input-primary" type="email" name="email" placeholder="johndoe@exemple.com"/>
+                        <span class="input-error text-xs text-red-700"></span>
                     </div>
-                    <div class="mt-5">
+                    <div class="mt-5 w-full">
                         <p>Tel</p>
-                        <input class="input-primary" type="num" placeholder="+33 0 00 00 00 00"/>
+                        <input class="input-primary" type="num" name="tel" placeholder="+33 0 00 00 00 00"/>
+                        <span class="input-error text-xs text-red-700"></span>
                     </div>
                 </div>
-                <div id="part2">
-                    <div class="mt-5">
+                <div id="part2" class="form-part">
+                    <div class="mt-5 w-full">
                         <p>Siret</p>
-                        <input class="input-primary" type="text" placeholder="123 456 789 12345"/>
+                        <input class="input-primary" type="text" name="siret" placeholder="123 456 789 12345"/>
+                        <span class="input-error text-xs text-red-700"></span>
                     </div>
-                    <div class="mt-5">
-                        <p></p>
-                        <input class="input-primary" type="text" placeholder="johndoe@exemple.com"/>
+                    <div class="mt-5 w-full">
+                        <p>Siret justificatif</p>
+                        <input class="input-primary" type="file" name="siret_file" accept="image/jpeg, image/png, .pdf"/>
+                        <span class="input-error text-xs text-red-700"></span>
+                    </div>
+                    <div class="mt-5 w-full">
+                        <p>Assurance</p>
+                        <input class="input-primary" type="text" name="assurance"/>
+                        <span class="input-error text-xs text-red-700"></span>
+                    </div>
+                    <div class="mt-5 w-full">
+                        <p>Assurance justificatif</p>
+                        <input class="input-primary" type="file" name="assurance_file" accept="image/jpeg, image/png, .pdf"/>
+                        <span class="input-error text-xs text-red-700"></span>
                     </div>
                 </div>
-            <a class="btn-primary" id="next"><button >Suivant</button></a>
-            <a class="btn-primary" id="back"><button>Retour</button></a>
-            <a class="btn-primary" href="#" id="register"><button>Inscription</button></a>
+                <div id="part3" class="form-part w-full">
+                    <div id="diploma-wrapper" class="flex flex-col gap-5 mt-5">
+                        <label class="block font-semibold mb-2">Pratiques <span class="text-xs">(max <span id="diploma-limit-js"></span>)</span></label>
+                    </div>
+                    <button type="button" class="btn-primary mt-2 mb-2" id="diploma-add-btn">+ Ajouter une pratique</button>
+                    <span class="input-error text-xs text-red-700"></span>
+                </div>
+                <div class="flex flex-row gap-4 w-full justify-between mt-5">
+                    <button class="btn-primary flex-1" id="back" type="button">Retour</button>
+                    <button class="btn-primary flex-1" id="next" type="button">Suivant</button>
+                    <button class="btn-primary flex-1" id="register" type="submit">Inscription</button>
+                </div>
             </form>
-            <a href="./praticien"><p class="text-center">J'ai déjà un compte</p></a><br>
+            <a href="./praticien"><p class="text-center mt-4">J'ai déjà un compte</p></a>
         </div>
     </div>
 </div>
 
 <style>
-#part2 {
+.form-part {
     display: none;
 }
 #back {
@@ -56,38 +104,18 @@ $TITLE = "Quotidio Planning - Connexion";
 #register {
     display: none;
 }
+.diploma-card {
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px #0001;
+    margin-bottom: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.input-error {
+    min-height: 1.25rem;
+    display: block;
+}
 </style>
-
-<script>
-
-const part1 = document.getElementById("part1")
-const part2 = document.getElementById("part2");
-
-const next = document.getElementById("next");
-const back = document.getElementById("back");
-const register = document.getElementById("register");
-
-next.addEventListener('click', function(event) {
-    event.preventDefault();
-
-    part2.style.display = 'block';
-    back.style.display = 'inline-block';
-    register.style.display = 'inline-block';
-
-    if (part1) part1.style.display = 'none';
-    next.style.display = 'none';
-});
-
-back.addEventListener('click', function(event) {
-    event.preventDefault();
-
-    part1.style.display = 'block';
-    next.style.display = 'inline-block';
-
-    if (part2) part2.style.display = 'none';
-    back.style.display = 'none';
-    register.style.display = 'none';
-});
-
-
-</script>

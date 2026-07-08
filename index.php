@@ -1,5 +1,11 @@
 <?php
 
+# ENV
+require_once __DIR__ . '/vendor/autoload.php'; 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/"); 
+$dotenv->load();
+
+session_start();
 $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
 // Default values

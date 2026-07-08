@@ -1,8 +1,12 @@
 document.addEventListener("click", function (e) {
     const link = e.target.closest("a");
 
-    if (link && link.href && link.host === window.location.host) {
-        
+    if (
+        link &&
+        link.href &&
+        link.host === window.location.host &&
+        !link.classList.contains("refresh") 
+    ) {
         if (link.target === "_blank") return;
 
         e.preventDefault();

@@ -1,25 +1,64 @@
 <?php
 $TITLE = "Quotidio Planning - Connexion";
+require_once './functions/connection.php';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    try {
+        $email = isset($_POST['emailInput']) ? trim($_POST['emailInput']) : '';
+        $password = isset($_POST['passwordInput']) ? trim($_POST['passwordInput']) : '';
+
+        if (empty($email) || empty($password)) {
+            header("Location: ?err=INPUT_NO_FILL");
+            exit;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header("Location: ?err=INVALID_EMAIL_FORMAT");
+            exit;
+        }
+
+        login($email, $password, "praticien");
+    } catch (Exception $e) {
+        echo $e;
+    }
+}
+
+if (isset($_SESSION["token"])) {
+    header("Location: /page/praticien/");
+    exit();
+}
+
 ?>
 <div class="center-box">
     <div class="con-box-1">
         <img class="w-80 ml-auto mr-auto" src="/assets/quotidio_big_logo.png" alt="quotidio_big_logo" draggable="false">
         <div>
             <h1 class="mt-2 text-2xl text-center text-primary">Connexion praticien·ne</h1>
+            <?php
+            if (isset($_GET["err"])) {
+                if ($_GET["err"] === "INVALID_USER") {
+                    ?> <h3 class="text-center text-red-800">L'email ou le mot de passe est incorrect</h3> <?php
+                } elseif ($_GET["err"] === "INPUT_NO_FILL") {
+                    ?> <h3 class="text-center text-red-800">Tous les champs ne sont pas remplis</h3> <?php
+                } elseif ($_GET["err"] === "INVALID_EMAIL_FORMAT") {
+                    ?> <h3 class="text-center text-red-800">L'email n'est pas dans le bon format</h3> <?php
+                } elseif ($_GET["err"] === "SUCCESS") {
+                    ?> <h3 class="text-center text-green-800">Connexion réussis</h3> <?php
+                }
+            }
+            ?>
             <form class="con-form" method="POST">
-                <div class="mt-2">
+                <div class="mt-5">
                     <p>Email</p>
-                    <input class="input-primary" type="email" placeholder="johndoe@example.com"/>
+                    <input class="input-primary" type="email" name="emailInput" placeholder="johndoe@example.com"/>
                 </div>
                 <div class="mt-5">
                     <p>Mot de passe</p>
-                    <input class="input-primary" type="password" placeholder="1234abcd"/>
+                    <input class="input-primary" type="password" name="passwordInput" placeholder="1234abcd"/>
                 </div>
-                <a class="btn-primary" href="#"><button type="submit">Connexion</button></a>
+                <button type="submit" class="btn-primary">Connexion</button>
             </form>
-            <a href="./praticien_register"><p class="text-center">Pas de compte ? Inscrivez vous</p></a><br>
-            <p class="text-center">
-            </p>
+            <a href="./praticien_register" class="refresh"><p class="text-center">Pas de compte ? Inscrivez vous</p></a><br>
         </div>
     </div>
 </div>
