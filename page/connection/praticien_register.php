@@ -34,45 +34,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="mt-2 flex flex-col md:flex-row gap-4 w-full">
                         <div class="flex flex-col w-full md:w-1/2">
                             <p>Nom</p>
-                            <input class="input-primary-small" type="text" name="lastname" placeholder="Doe"/>
+                            <input class="input-primary-small" type="text" name="lastname" placeholder="Doe" required/>
                             <span class="input-error text-xs text-red-700"></span>
                         </div>
                         <div class="flex flex-col w-full md:w-1/2">
                             <p>Prénom</p>
-                            <input class="input-primary-small" type="text" name="firstname" placeholder="John"/>
+                            <input class="input-primary-small" type="text" name="firstname" placeholder="John" required/>
                             <span class="input-error text-xs text-red-700"></span>
                         </div>
                     </div>
                     <div class="mt-5 w-full">
                         <p>Email</p>
-                        <input class="input-primary" type="email" name="email" placeholder="johndoe@exemple.com"/>
+                        <input class="input-primary" type="email" name="email" placeholder="johndoe@exemple.com" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                     <div class="mt-5 w-full">
                         <p>Tel</p>
-                        <input class="input-primary" type="num" name="tel" placeholder="+33 0 00 00 00 00"/>
+                        <input class="input-primary" type="num" name="tel" placeholder="+33 0 00 00 00 00" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                 </div>
                 <div id="part2" class="form-part">
                     <div class="mt-5 w-full">
                         <p>Siret</p>
-                        <input class="input-primary" type="text" name="siret" placeholder="123 456 789 12345"/>
+                        <input class="input-primary" type="text" name="siret" placeholder="123 456 789 12345" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                     <div class="mt-5 w-full">
                         <p>Siret justificatif</p>
-                        <input class="input-primary" type="file" name="siret_file" accept="image/jpeg, image/png, .pdf"/>
+                        <input class="input-primary" type="file" name="siret_file" accept="image/jpeg, image/png, .pdf" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                     <div class="mt-5 w-full">
                         <p>Assurance</p>
-                        <input class="input-primary" type="text" name="assurance"/>
+                        <input class="input-primary" type="text" name="assurance" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                     <div class="mt-5 w-full">
                         <p>Assurance justificatif</p>
-                        <input class="input-primary" type="file" name="assurance_file" accept="image/jpeg, image/png, .pdf"/>
+                        <input class="input-primary" type="file" name="assurance_file" accept="image/jpeg, image/png, .pdf" required/>
+                        <span class="input-error text-xs text-red-700"></span>
+                    </div>
+                    <div class="mt-5 w-full">
+                        <p>Expiration de l'assurance</p>
+                        <input class="input-primary" type="date" name="assurance_exp" required/>
                         <span class="input-error text-xs text-red-700"></span>
                     </div>
                 </div>
@@ -81,12 +86,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <label class="block font-semibold mb-2">Pratiques <span class="text-xs">(max <span id="diploma-limit-js"></span>)</span></label>
                     </div>
                     <button type="button" class="btn-primary mt-2 mb-2" id="diploma-add-btn">+ Ajouter une pratique</button>
-                    <span class="input-error text-xs text-red-700"></span>
+                    <span class="input-error text-xs text-red-700"></span> 
+                    <div>
+                        <p><input type="checkbox" name="condition" required/> Je reconnais avoir lu et accepté sans réserve les <a class="bold underline" href="/help/convention" target="_blank">conditions de ce partenariat</a>. Je comprends que mon inscription ne pourra pas être validée sans cette acceptation.</p>
+                        <span class="input-error text-xs text-red-700"></span>
+                    </div>
                 </div>
                 <div class="flex flex-row gap-4 w-full justify-between mt-5">
                     <button class="btn-primary flex-1" id="back" type="button">Retour</button>
                     <button class="btn-primary flex-1" id="next" type="button">Suivant</button>
-                    <button class="btn-primary flex-1" id="register" type="submit">Inscription</button>
+                    <button class="btn-primary flex-1" id="register" type="submit">Je m'inscris !</button>
                 </div>
             </form>
             <a href="./praticien"><p class="text-center mt-4">J'ai déjà un compte</p></a>

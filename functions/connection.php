@@ -2,26 +2,6 @@
 require_once 'generation.php';
 require_once 'db.php';
 
-function verif_token($token) {
-    global $sql;
-    try {
-        $sqlQuery = "SELECT * FROM users WHERE token = :token LIMIT 1";
-        $sqlRequest = $sql->prepare($sqlQuery);
-        $sqlRequest->execute([
-            'token' => $token
-        ]);
-        $sqlResult = $sqlRequest->fetch(PDO::FETCH_ASSOC);
-
-        if ($sqlResult) {
-            return $sqlResult;
-        } else {
-            return false;
-        }
-    } catch (Exception $e) {
-        return false;
-    }
-}
-
 function login($username, $password, $type) {
     global $sql;
     try {
@@ -61,6 +41,8 @@ function register($post, $files) {
     $tel = isset($post['tel']) ? sanitize($post['tel']) : null;
     $siret = isset($post['siret']) ? sanitize($post['siret']) : null;
     $assurance = isset($post['assurance']) ? sanitize($post['assurance']) : null;
+    $assurance_exp = isset($post['assurance_exp']) ? sanitize($post['assurance_exp']) : null;
+
 
     if ($email) {
         $emailCheck = $sql->prepare("SELECT id FROM praticien WHERE email = :email LIMIT 1");
@@ -78,18 +60,7 @@ function register($post, $files) {
         return $response;
     }
 
-    $uploadDir = __DIR__ . '/../uploads/praticien/';
-    if (!is_dir($uploadDir)) {
-        if (!mkdir($uploadDir, 0755, true)) {
-            $msg = "Échec de la création du dossier d'upload ($uploadDir).";
-            error_log("[register] $msg");
-            $response['errors'][] = $msg;
-            return $response;
-        }
-    }
-
-    function handleUpload($file, $prefix) {
-        global $uploadDir;
+    function getFileBlob($file) {
         if ($file['error'] !== UPLOAD_ERR_OK) {
             error_log("[register] Fichier {$file['name']} upload error: code {$file['error']}");
             return false;
@@ -99,46 +70,46 @@ function register($post, $files) {
             error_log("[register] Fichier {$file['name']} extension invalide: .{$ext}");
             return false;
         }
-        $safeName = $prefix . '_' . uniqid() . '.' . $ext;
-        $filePath = $uploadDir . $safeName;
-        if (move_uploaded_file($file['tmp_name'], $filePath)) {
-            return 'uploads/praticien/' . $safeName;
+        $blob = file_get_contents($file['tmp_name']);
+        if ($blob === false) {
+            error_log("[register] Impossible de lire le contenu du fichier {$file['name']}");
+            return false;
         }
-        error_log("[register] move_uploaded_file failed for {$file['name']} to $filePath");
-        return false;
+        return $blob;
     }
 
-    $siret_justificatif = handleUpload($files['siret_file'], 'siret');
-    if (!$siret_justificatif) {
-        $msg = "Erreur lors de l'envoi du justificatif de siret.";
+    $siret_justificatif_blob = getFileBlob($files['siret_file']);
+    if ($siret_justificatif_blob === false) {
+        $msg = "Erreur lors de la lecture du justificatif de siret.";
         error_log("[register] $msg");
         $response['errors'][] = $msg;
         return $response;
     }
-    $assurance_justificatif = handleUpload($files['assurance_file'], 'assurance');
-    if (!$assurance_justificatif) {
-        $msg = "Erreur lors de l'envoi du justificatif d'assurance.";
+
+    $assurance_justificatif_blob = getFileBlob($files['assurance_file']);
+    if ($assurance_justificatif_blob === false) {
+        $msg = "Erreur lors de la lecture du justificatif d'assurance.";
         error_log("[register] $msg");
         $response['errors'][] = $msg;
         return $response;
     }
-    
+
     try {
         $created_at = date('Y-m-d H:i:s');
-        $insert = $sql->prepare("INSERT INTO praticien (user_id, name, surname, email, tel, siret, siret_justificatif, assurance, assurance_justificatif, state, created_at) 
-            VALUES (NULL, :name, :surname, :email, :tel, :siret, :siret_justificatif, :assurance, :assurance_justificatif, 'pending', :created_at)");
+        $insert = $sql->prepare("INSERT INTO praticien (user_id, name, surname, email, tel, siret, siret_justificatif, assurance, assurance_justificatif, assurance_date, state, created_at) 
+            VALUES (NULL, :name, :surname, :email, :tel, :siret, :siret_justificatif, :assurance, :assurance_justificatif, :assurance_date, 'pending', :created_at)");
 
-        $insert->execute([
-            'name' => $name,
-            'surname' => $surname,
-            'email' => $email,
-            'tel' => $tel,
-            'siret' => $siret,
-            'siret_justificatif' => $siret_justificatif,
-            'assurance' => $assurance,
-            'assurance_justificatif' => $assurance_justificatif,
-            'created_at' => $created_at,
-        ]);
+        $insert->bindParam(':name', $name);
+        $insert->bindParam(':surname', $surname);
+        $insert->bindParam(':email', $email);
+        $insert->bindParam(':tel', $tel);
+        $insert->bindParam(':siret', $siret);
+        $insert->bindParam(':siret_justificatif', $siret_justificatif_blob, PDO::PARAM_LOB);
+        $insert->bindParam(':assurance', $assurance);
+        $insert->bindParam(':assurance_justificatif', $assurance_justificatif_blob, PDO::PARAM_LOB);
+        $insert->bindParam(':assurance_date', $assurance_exp);
+        $insert->bindParam(':created_at', $created_at);
+        $insert->execute();
 
         $praticien_id = $sql->lastInsertId();
         if (!$praticien_id) {
@@ -165,19 +136,18 @@ function register($post, $files) {
                         'error' => $diplomaFiles['error'][$idx],
                         'size' => $diplomaFiles['size'][$idx]
                     ];
-                    $justificatifPath = handleUpload($fakeFile, 'diplome' . $idx);
-                    if (!$justificatifPath) {
+                    $justificatif_blob = getFileBlob($fakeFile);
+                    if ($justificatif_blob === false) {
                         $msg = "Erreur enregistrement du justificatif pour la pratique: " . $nameDiploma;
                         error_log("[register] $msg");
                         $response['errors'][] = $msg;
                         continue;
                     }
                     $insertJustif = $sql->prepare("INSERT INTO praticien_justificatif (praticien_id, pratique, justificatif) VALUES (:praticien_id, :pratique, :justificatif)");
-                    $insertJustif->execute([
-                        'praticien_id' => $praticien_id,
-                        'pratique' => $nameDiploma,
-                        'justificatif' => $justificatifPath
-                    ]);
+                    $insertJustif->bindParam(':praticien_id', $praticien_id);
+                    $insertJustif->bindParam(':pratique', $nameDiploma);
+                    $insertJustif->bindParam(':justificatif', $justificatif_blob, PDO::PARAM_LOB);
+                    $insertJustif->execute();
                 } else {
                     $msg = "Fichier justificatif manquant/mal uploadé pour : " . $nameDiploma;
                     error_log("[register] $msg");
@@ -200,4 +170,151 @@ function register($post, $files) {
     }
 
     return $response;
+}
+
+function verif_token($token) {
+    global $sql;
+    try {
+        $sqlQuery = "SELECT * FROM users WHERE token = :token LIMIT 1";
+        $sqlRequest = $sql->prepare($sqlQuery);
+        $sqlRequest->execute([
+            'token' => $token
+        ]);
+        $sqlResult = $sqlRequest->fetch(PDO::FETCH_ASSOC);
+
+        if ($sqlResult) {
+            return $sqlResult;
+        } else {
+            return false;
+        }
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function get_clients($signed_convention=False) {
+    global $sql;
+    if ($signed_convention){
+        $request = $sql->prepare("SELECT * FROM client WHERE signed_convention=1");
+    }
+    else {
+        $request = $sql->prepare("SELECT * FROM client");
+    }
+    $request->execute();
+    return $request->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function get_client($id) {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM client WHERE id=:id");
+    $request->execute([
+        "id" => $id
+    ]);
+    $result = $request->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        return $result;
+    } else {
+        return false;
+    }
+}
+
+function get_praticiens($state) {
+    global $sql;
+    if ($state == "validate"){
+        $request = $sql->prepare("SELECT * FROM praticien WHERE state='validate'");
+    }
+    else if ($state == "pending") {
+        $request = $sql->prepare("SELECT * FROM praticien WHERE state='pending'");
+    } else if ($state == "refuse") {
+        $request = $sql->prepare("SELECT * FROM praticien WHERE state='refuse'");
+    } else {
+        $request = $sql->prepare("SELECT * FROM praticien");
+    } 
+    $request->execute();
+    return $request->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function get_praticien($id) {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM praticien WHERE id=:id");
+    $request->execute([
+        "id" => $id
+    ]);
+    $result = $request->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        return $result;
+    } else {
+        return false;
+    }
+}
+
+function set_praticien_state($id, $state) {
+    global $sql;
+    $request = $sql->prepare("UPDATE `praticien` SET state=:state WHERE id=:id");
+    $request->execute([
+        "state" => $state,
+        "id" => $id
+    ]);
+}
+
+function set_praticien_to_valide($id) {
+    global $sql;
+    set_praticien_state($id, "validate");
+    $praticien = get_praticien($id);
+    try {
+        $password = generateToken(12);
+        $request = $sql->prepare("INSERT INTO `users` (identifiant, password, token, type, user_id) VALUES (:identifiant, :password, :token, 'praticien', :user_id) ");
+        $request->execute([
+            "identifiant" => $praticien["email"],
+            "password" => password_hash($password, PASSWORD_BCRYPT),
+            "token" => generateToken(32),
+            "user_id" => $praticien["id"]
+        ]);
+        $user_id = $sql->lastInsertId();
+    } catch (PDOException $e) {
+        $user_id = null;
+    }
+    
+    $request1 = $sql->prepare("UPDATE `praticien` SET user_id=:user_id WHERE id=:id");
+    $request1->execute([
+        "user_id" => $user_id,
+        "id" => $id
+    ]);
+
+    return $password;
+}
+
+function refuse_del_praticien($id) {
+    global $sql;
+    set_praticien_state($id, "refuse");
+    $request = $sql->prepare("DELETE FROM `users` WHERE user_id=:id");
+    $request->execute([
+        "id" => $id
+    ]);
+}
+
+function delete_praticien($id) {
+    global $sql;
+    $request = $sql->prepare("DELETE FROM `praticien` WHERE id=:id");
+    $request->execute([
+        "id" => $id
+    ]);
+    $request1 = $sql->prepare("DELETE FROM `users` WHERE user_id=:id");
+    $request1->execute([
+        "id" => $id
+    ]);
+} 
+
+function get_praticien_justificatif($id) {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM praticien_justificatif WHERE praticien_id=:id");
+    $request->execute([
+        "id" => $id
+    ]);
+    $result = $request->fetchAll(PDO::FETCH_ASSOC);
+    if ($result) {
+        return $result;
+    } else {
+        return false;
+    }
 }

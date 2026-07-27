@@ -1,3 +1,4 @@
 .DS_STORE
 .env
 page/test/
+node_modules/

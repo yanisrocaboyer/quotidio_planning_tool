@@ -81,6 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (siretFile && (!siretFile.files || siretFile.files.length === 0)) {
                 valid = false;
                 showError(siretFile, 'Veuillez joindre le justificatif de siret.');
+            } else if (siretFile && siretFile.files && siretFile.files.length > 0) {
+                let file = siretFile.files[0];
+                let ext = file.name.split('.').pop().toLowerCase();
+                if(!['jpeg', 'jpg', 'png', 'pdf'].includes(ext)) {
+                    valid = false;
+                    showError(siretFile, 'Le fichier de justificatif de siret doit être au format PDF ou image (JPEG, JPG, PNG).');
+                }
             }
             // Assurance
             let assurance = part.querySelector('input[name="assurance"]');
@@ -93,7 +100,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (assuranceFile && (!assuranceFile.files || assuranceFile.files.length === 0)) {
                 valid = false;
                 showError(assuranceFile, 'Veuillez joindre le justificatif d\'assurance.');
+            } else if (assuranceFile && assuranceFile.files && assuranceFile.files.length > 0) {
+                let file = assuranceFile.files[0];
+                let ext = file.name.split('.').pop().toLowerCase();
+                if(!['jpeg', 'jpg', 'png', 'pdf'].includes(ext)) {
+                    valid = false;
+                    showError(assuranceFile, 'Le fichier de justificatif d\'assurance doit être au format PDF ou image (JPEG, JPG, PNG).');
+                }
             }
+            // Assurance exp
+            let assuranceExp = part.querySelector('input[name="assurance_exp"]');
+            if (assuranceExp && !assuranceExp.value.trim()) {
+                valid = false;
+                showError(assuranceExp, 'Veuillez remplir la date d\'expiration de l\'assurance.');
+            }
+       
         } else if (idx === 2) {
             clearErrors(part);
 
@@ -115,9 +136,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!inputFile.files || inputFile.files.length === 0) {
                         valid = false;
                         showError(inputFile, 'Veuillez joindre un fichier.');
+                    } else if (inputFile.files && inputFile.files.length > 0) {
+                        let file = inputFile.files[0];
+                        let ext = file.name.split('.').pop().toLowerCase();
+                        if(!['jpeg', 'jpg', 'png', 'pdf'].includes(ext)) {
+                            valid = false;
+                            showError(inputFile, 'Le fichier doit être au format PDF ou image (JPEG, JPG, PNG).');
+                        }
                     }
                 });
             }
+            // Condition 
+            let conditionCheckbox = part.querySelector('input[name="condition"]');
+            if (!conditionCheckbox || !conditionCheckbox.checked) {
+                valid = false;
+                showError(conditionCheckbox, 'Veuillez accepter les conditions.');
+            }
+       
         }
 
         return valid;
@@ -255,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearGlobalError();
         if (!validateAllParts()) {
             event.preventDefault();
-            globalError.textContent = "Veuillez remplir correctement tous les champs du formulaire (au moins un diplôme/certification doit être ajouté).";
+            globalError.textContent = "Veuillez remplir correctement tous les champs du formulaire (au moins un diplôme/certification doit être ajouté) et acceptez les conditions.";
             for(let i=0; i<parts.length; i++) {
                 if (!validatePart(i)) {
                     currentPartIdx = i;

@@ -13,19 +13,19 @@
         <p>Ateliers</p>
         <hr class="text-gray-300">
         <div>
-            <a href=".#progress" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/index#pending" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">calendar_today</span>
                 <p class="ml-1">Ateliers en cours</p>
             </a>
         </div>
         <div>
-            <a href=".#future" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/index#future" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">event_upcoming</span>
                 <p class="ml-1">Ateliers à venir</p>
             </a>
         </div>
         <div>
-            <a href=".#pass" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/index#pass" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">calendar_check</span>
                 <p class="ml-1">Ateliers passés</p>
             </a>
@@ -33,13 +33,13 @@
         <p class="mt-7">Gestions</p>
         <hr class="text-gray-300">
         <div>
-            <a href=".#partenaire" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/client_gestion.php" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">account_circle</span>
                 <p class="ml-1">Gestion des partenaires</p>
             </a>
         </div>
         <div>
-            <a href=".#praticien" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/praticien_gestion.php" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">identity_platform</span>
                 <p class="ml-1">Gestion des praticiens</p>
             </a>
@@ -48,13 +48,13 @@
     <div class="text-xl mt-auto pt-3 bg-secondary rounded-t-xl">
         <div class="ml-5 mb-5">
             <div>
-                <a href=".#support" class="flex items-center mt-2 text-white hover:text-green-400">
+                <a href="/admin/support" class="flex items-center mt-2 support">
                     <span class="material-symbols-outlined">support</span>
                     <p class="ml-1">Support</p>
                 </a>
             </div>
             <div>
-                <a href="../logout.php" class="flex items-center mt-1 text-white hover:text-red-300">
+                <a href="../logout.php" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="ml-1">Déconnexion</p>
                 </a>

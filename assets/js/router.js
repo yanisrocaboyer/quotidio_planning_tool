@@ -28,10 +28,26 @@ function loadPage(url) {
         return response.text();
     })
     .then(html => {
-        document.getElementById("content").innerHTML = html;
+        const contentContainer = document.getElementById("content");     
+        contentContainer.innerHTML = html;
+
+        const scripts = contentContainer.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            
+            Array.from(oldScript.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
 
         window.history.pushState({ path: url }, "", url);
         
+        if (typeof window.initThemeSystem === "function") {
+            window.initThemeSystem();
+        }
     })
     .catch(error => {
         console.error("Erreur de chargement :", error);
