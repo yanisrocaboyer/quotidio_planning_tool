@@ -181,7 +181,7 @@ function formatFrenchDate($dt) {
                             </div>
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
+                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants'])?> Personnes</p>
                             </div>
                         </div>
                     </div>
@@ -223,7 +223,7 @@ function formatFrenchDate($dt) {
                             </div>
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
+                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?> Personnes</p>
                             </div>
                         </div>
                     </div>
@@ -265,7 +265,7 @@ function formatFrenchDate($dt) {
                             </div>
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
+                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?> Personnes</p>
                             </div>
                         </div>
                     </div>
@@ -285,16 +285,21 @@ const createAtelierBtn = document.getElementById("createAtelierBtn");
 const popupFrame = document.querySelector(".popup-frame");
 const cancelBtn = document.getElementById("cancelBtn");
 
-createAtelierBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "";
-});
 popupAtelier.addEventListener("click", () => {
     popupAtelier.style.display = "none";
 });
-cancelBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "none";
-});
-popupFrame.addEventListener("click", (event) => {
+if (createAtelierBtn) {
+    createAtelierBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        popupAtelier.style.display = "";
+    });
+}
+if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+        popupAtelier.style.display = "none";
+    });
+}
+popupAtelier.querySelector(".popup-frame").addEventListener("click", (event) => {
     event.stopPropagation();
 });
 </script>

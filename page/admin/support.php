@@ -16,9 +16,10 @@ $TITLE = "Quotidio Planning - Admin";
         <div class="content">
             <div class="ml-5 mt-5">
                 <div class="flex">
-                    <h1 class="text-2xl">👋 Bonjour, <?php echo $user["identifiant"] ?></h1>
+                    <h1 class="text-2xl">🛟 Support</h1>
                 </div>
-                <p>Page en construction...</p>
+                <p>Cette page est destiné en cas de problème ou d'indication afin de vous aidez dans vos démarches.</p>
+                <p>En cas de problème, merci de contacter: <a href="mailto:yanis.rocaboyer@mazegroup.org">yanis.rocaboyer@mazegroup.org</a></p>
             </div>
         </div>
     </div>

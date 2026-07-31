@@ -1,5 +1,7 @@
 <?php
 require_once './functions/connection.php';
+error_reporting(E_ALL & ~E_WARNING);
+
 
 $user = verif_token($_SESSION["token"]);
 $access = $user["type"];
@@ -11,11 +13,31 @@ else {
 $TITLE = "Quotidio Planning - Admin";
 
 if (!isset($_GET["type"]) || !isset($_GET["user_id"])) {
-    echo "Type et/ou Utilisateur inconnu";
-    exit;
-}
+    ?>
+    <div class="dashboard">
+    <div class="dashboard-content">
+        <?php include 'components/admin/sidebar.php' ?> 
+        <div class="content">
+            <div class="ml-5 mt-5">
+                <p>Type et/ou Utilisateur inconnu</p>
+            </div>
+        </div>
+    </div>
+    <?php
+} else {
 $type = $_GET["type"];
 $user_id = $_GET["user_id"];
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $result = edit_client($user_id, $_POST);
+
+    if ($result != "error") {
+        header("Location: ?type=client&user_id={$user_id}&error=clientUpdateSuccess");
+        exit;
+    } else {
+        header("Location: ?type=client&user_id={$user_id}&error=clientUpdateFailed&msg=". $result);
+    }
+}
 
 ?>
 <div class="dashboard">
@@ -23,12 +45,12 @@ $user_id = $_GET["user_id"];
         <?php include 'components/admin/sidebar.php' ?> 
         <div class="content">
             <div class="ml-5 mt-5">
-                <div class="flex">
-                    <h1 class="text-2xl">👋 Bonjour, <?php echo $user["identifiant"] ?></h1>
-                </div>
                 <?php
                 if ($type == "praticien"){
                     $praticien = get_praticien($user_id);
+                    if ($praticien["id"] == NULL) {
+                        echo "<p>Praticien inconnu</p>";
+                    } else {
                     $praticien_id = $praticien["id"];
                     ?>
 
@@ -167,6 +189,75 @@ $user_id = $_GET["user_id"];
                         ?>
                     </div>
                     <?php
+                }}
+                ?>
+                <?php
+                if ($type == "client"){
+                    $client = get_client($user_id);
+                    if ($client["id"] == NULL) {
+                        echo "<p>Client inconnu</p>";
+                    } else {
+                    $client_id = $client["id"];
+                    ?>
+                    <h2>Gestion de <?php echo htmlspecialchars($client["name"]) ?></h2>
+                    <div class="mt-2">
+                        <?php
+                        if (isset($_GET["error"]) && $_GET["error"] == "clientUpdateFailed") {
+                            echo "<p class='text-red-500'>Error lors de l'édition du client: {$_GET['msg']} </p>";
+                        } else if (isset($_GET["error"]) && $_GET["error"] == "clientUpdateSuccess") {
+                            echo "<p class='text-green-600'>Mise à jour du client réussis !</p>";
+                        } else if (isset($_GET["infoMsg"])) {
+                            echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
+                        }
+                        ?>
+                        <h3 ><b>Informations :</b></h3>
+                        <form method="POST">
+                            <div class="mt-3">
+                                <label for="nameInput">Nom :</label>
+                                <input type="text" id="nameInput" name="nameInput" value="<?php echo htmlspecialchars($client['name']) ?>" required>
+                            </div>
+                            <div class="mt-3">
+                                <label for="emailInput">Adresse e-mail :</label>
+                                <input type="email" id="emailInput" name="emailInput" value="<?php echo htmlspecialchars($client['email']) ?>" required>
+                            </div>
+                            <div class="mt-3">
+                                <label for="telInput">Numéro de téléphone :</label>
+                                <input type="tel" id="telInput" name="telInput" value="<?php echo htmlspecialchars($client['tel']) ?>" required>
+                            </div>
+                            <div class="mt-3">
+                                <label for="adressInput">Adresse :</label>
+                                <input type="text" id="adressInput" name="adressInput" value="<?php echo htmlspecialchars($client['adress']) ?>" required>
+                            </div>
+                            <button class="mt-2 underline" type="submit">Modifier les informations</button>
+                        </form>
+                    </div>
+                    <div class="mt-2">
+                        <h3><b>Actions :</b></h3>
+                        <?php
+                        if($client["user_id"] == NULL) {
+                            ?>
+                            <p>Aucun compte utilisateur est associé au client:</p>
+                            <a href="?action=createClientUser&type=client&user_id=<?= $client["id"] ?>">Créer un compte utilisateur</a>
+                            <?php
+                                if (isset($_GET['action']) && $_GET['action'] === 'createClientUser' && isset($_GET['user_id']) && $_GET['user_id'] == $client["id"]) {
+                                    require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
+                                    $result = create_client_user($client["id"]);
+                                    echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                                    header("Location: ?type=client&user_id={$client['id']}&infoMsg={$result}");
+                                }
+                        } else {
+                            ?>
+                            <a href="?action=deleteClient&type=client&user_id=<?= $client["id"] ?>" class="danger">Supprimer le compte</a>
+                            <?php
+                                if (isset($_GET['action']) && $_GET['action'] === 'deleteClient' && isset($_GET['user_id']) && $_GET['user_id'] == $client["id"]) {
+                                    require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
+                                    $result = delete_client($user_id);
+                                    echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                                    header("Location: client_gestion.php?msg={$result}");
+                                }
+                        }}
+                        ?>
+                <?php
                 }
                 ?>
             </div>
@@ -174,7 +265,7 @@ $user_id = $_GET["user_id"];
     </div>
 </div>
 <?php
-}
+}}
 ?>
 
 <script>

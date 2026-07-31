@@ -192,12 +192,13 @@ function verif_token($token) {
     }
 }
 
-function get_clients($signed_convention=False) {
+/* Clients */
+
+function get_clients($signed_convention = false) {
     global $sql;
-    if ($signed_convention){
+    if ($signed_convention) {
         $request = $sql->prepare("SELECT * FROM client WHERE signed_convention=1");
-    }
-    else {
+    } else {
         $request = $sql->prepare("SELECT * FROM client");
     }
     $request->execute();
@@ -217,6 +218,144 @@ function get_client($id) {
         return false;
     }
 }
+
+
+function delete_client($id) {
+    global $sql;
+    try {
+        $request = $sql->prepare("DELETE FROM `client` WHERE id=:id");
+        $request->execute([
+            "id" => $id
+        ]);
+
+        $request1 = $sql->prepare("DELETE FROM users WHERE user_id=:id AND type='client'");
+        $request1->execute(["id" => $id]);
+
+        return "accountDeleted";
+    } catch (Exception $e) {
+        error_log("[delete_client] Exception: " . $e->getMessage());
+        return $e;
+    }
+}
+
+function create_client_user($id) {
+    global $sql;
+    try {
+        $client = get_client($id);
+        if (!$client) {
+            return false;
+        }
+
+        $email = $client["email"];
+        $client_id = $client["id"];
+
+        $password = generateToken(12);
+
+        $request = $sql->prepare("INSERT INTO `users` (identifiant, password, token, type, user_id) VALUES (:identifiant, :password, :token, 'client', :user_id)");
+        $request->execute([
+            "identifiant" => $email,
+            "password" => password_hash($password, PASSWORD_BCRYPT),
+            "token" => generateToken(32),
+            "user_id" => $client_id
+        ]);
+
+        $user_id = $sql->lastInsertId();
+
+        $update = $sql->prepare("UPDATE `client` SET user_id=:user_id WHERE id=:id");
+        $update->execute([
+            "user_id" => $user_id,
+            "id" => $client_id
+        ]);
+
+        return $password;
+    } catch (Exception $e) {
+        error_log("[create_client_user] Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
+function add_client($post) {
+    global $sql;
+    try {
+        if (
+            empty($post["nameInput"]) ||
+            empty($post["adressInput"]) ||
+            empty($post["emailInput"]) ||
+            empty($post["telInput"])
+        ) {
+            return "error:missing_data";
+        }
+
+        $name = htmlspecialchars(trim($post["nameInput"]), ENT_QUOTES, "UTF-8");
+        $adress = htmlspecialchars(trim($post["adressInput"]), ENT_QUOTES, "UTF-8");
+        $email = htmlspecialchars(trim($post["emailInput"]), ENT_QUOTES, "UTF-8");
+        $tel = htmlspecialchars(trim($post["telInput"]), ENT_QUOTES, "UTF-8");
+
+        $sql_str = "INSERT INTO client (name, email, tel, adress, signed_convention) 
+            VALUES (:name, :email, :tel, :adress, 1)";
+        $insert = $sql->prepare($sql_str);
+
+        $insert->bindParam(':name', $name);
+        $insert->bindParam(':email', $email);
+        $insert->bindParam(':tel', $tel);
+        $insert->bindParam(':adress', $adress);
+
+        $result = $insert->execute();
+        $client_id = $sql->lastInsertId();
+
+        $password = create_client_user($client_id);
+
+        if ($result && $password) {
+            return $password;
+        } else {
+            return "error:insert_failed";
+        }
+    } catch (Exception $e) {
+        error_log("[add_client] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+function edit_client($id, $post) {
+    global $sql;
+    try {
+        if (
+            empty($post["nameInput"]) ||
+            empty($post["adressInput"]) ||
+            empty($post["emailInput"]) ||
+            empty($post["telInput"])
+        ) {
+            return "error:missing_data";
+        }
+
+        $name = htmlspecialchars(trim($post["nameInput"]), ENT_QUOTES, "UTF-8");
+        $adress = htmlspecialchars(trim($post["adressInput"]), ENT_QUOTES, "UTF-8");
+        $email = htmlspecialchars(trim($post["emailInput"]), ENT_QUOTES, "UTF-8");
+        $tel = htmlspecialchars(trim($post["telInput"]), ENT_QUOTES, "UTF-8");
+
+        $sql_str = "UPDATE client SET name = :name, adress = :adress, email = :email, tel = :tel WHERE id = :id";
+        $update = $sql->prepare($sql_str);
+
+        $update->bindParam(':name', $name);
+        $update->bindParam(':adress', $adress);
+        $update->bindParam(':email', $email);
+        $update->bindParam(':tel', $tel);
+        $update->bindParam(':id', $id);
+
+        $result = $update->execute();
+
+        if ($result) {
+            return "success";
+        } else {
+            return "error:update_failed";
+        }
+    } catch (Exception $e) {
+        error_log("[edit_client] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+/* Praticiens */
 
 function get_praticiens($state) {
     global $sql;

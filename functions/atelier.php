@@ -97,7 +97,7 @@ function get_ateliers($type, $user="admin", $id=NULL) {
             $request->execute(["id" => $id]);
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
-    }
+    } 
 }
 
 function get_atelier_types() {

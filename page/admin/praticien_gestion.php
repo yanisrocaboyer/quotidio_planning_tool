@@ -16,7 +16,7 @@ $TITLE = "Quotidio Planning - Admin";
         <div class="content">
             <div class="ml-5 mt-5">
                 <div class="flex">
-                    <h1 class="text-2xl">👋 Bonjour, <?php echo $user["identifiant"] ?></h1>
+                    <h1 class="text-2xl">Gestions des praticien·ne·s</h1>
                 </div>
                 <?php
                 if (isset($_GET["msg"]) && $_GET["msg"]) {
