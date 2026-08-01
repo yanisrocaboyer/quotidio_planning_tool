@@ -93,7 +93,7 @@ function formatFrenchDate($dt) {
                             <div class="mt-5">
                                 <p>Partenaire</p>
                                 <?php
-                                    $clients = get_clients(True);
+                                    $clients = get_clients();
                                 ?>
                                 <select class="input-primary" name="clientInput" required>
                                     <option value="">Sélectionner un partenaire</option>
@@ -151,7 +151,7 @@ function formatFrenchDate($dt) {
                 ?>
                 <div class="grid grid-cols-2 gap-4">
                     <?php foreach ($ateliers_pending as $atelier): ?>
-                    <div class="atelier">
+                    <a href="atelier_gestion?id=<?= $atelier['id'] ?>"><div class="atelier">
                         <div class="ml-2 mt-1 mb-1">
                             <h2>
                                 <?php
@@ -185,6 +185,7 @@ function formatFrenchDate($dt) {
                             </div>
                         </div>
                     </div>
+                    </a>
                     <?php endforeach; ?>
                 </div>
                 <h2 class="mt-2" id="futur">Ateliers à venir</h2>

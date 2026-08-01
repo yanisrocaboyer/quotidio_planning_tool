@@ -194,13 +194,9 @@ function verif_token($token) {
 
 /* Clients */
 
-function get_clients($signed_convention = false) {
+function get_clients() {
     global $sql;
-    if ($signed_convention) {
-        $request = $sql->prepare("SELECT * FROM client WHERE signed_convention=1");
-    } else {
-        $request = $sql->prepare("SELECT * FROM client");
-    }
+    $request = $sql->prepare("SELECT * FROM client");
     $request->execute();
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -323,7 +319,8 @@ function edit_client($id, $post) {
             empty($post["nameInput"]) ||
             empty($post["adressInput"]) ||
             empty($post["emailInput"]) ||
-            empty($post["telInput"])
+            empty($post["telInput"]) ||
+            empty($post["noteInput"])
         ) {
             return "error:missing_data";
         }
@@ -332,14 +329,16 @@ function edit_client($id, $post) {
         $adress = htmlspecialchars(trim($post["adressInput"]), ENT_QUOTES, "UTF-8");
         $email = htmlspecialchars(trim($post["emailInput"]), ENT_QUOTES, "UTF-8");
         $tel = htmlspecialchars(trim($post["telInput"]), ENT_QUOTES, "UTF-8");
+        $note = htmlspecialchars(trim($post["noteInput"]), ENT_QUOTES, "UTF-8");
 
-        $sql_str = "UPDATE client SET name = :name, adress = :adress, email = :email, tel = :tel WHERE id = :id";
+        $sql_str = "UPDATE client SET name = :name, adress = :adress, email = :email, tel = :tel, note = :note WHERE id = :id";
         $update = $sql->prepare($sql_str);
 
         $update->bindParam(':name', $name);
         $update->bindParam(':adress', $adress);
         $update->bindParam(':email', $email);
         $update->bindParam(':tel', $tel);
+        $update->bindParam(':note', $note);
         $update->bindParam(':id', $id);
 
         $result = $update->execute();

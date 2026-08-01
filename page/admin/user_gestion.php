@@ -228,6 +228,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <label for="adressInput">Adresse :</label>
                                 <input type="text" id="adressInput" name="adressInput" value="<?php echo htmlspecialchars($client['adress']) ?>" required>
                             </div>
+                            <div class="mt-3">
+                                <label for="adressInput">Commentaire :</label>
+                                <input type="text" id="noteInput" name="noteInput" value="<?php echo $client['note'] ?>">
+                            </div>
                             <button class="mt-2 underline" type="submit">Modifier les informations</button>
                         </form>
                     </div>

@@ -106,3 +106,11 @@ function get_atelier_types() {
     $request->execute();
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
+
+function get_atelier($id) {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM atelier WHERE id = :id");
+    $request->execute(["id" => $id]);
+    return $request->fetch(PDO::FETCH_ASSOC);
+}
+
