@@ -1,7 +1,7 @@
 <?php
 require_once './functions/connection.php';
 require_once './functions/atelier.php';
-require_once './functions/info.php';
+require_once './components/admin/atelier.php';
 
 error_reporting(E_ALL & ~E_WARNING);
 
@@ -39,6 +39,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         header("Location: ?id={$id}&error=atelierUpdateFailed&msg=". $result);
     }
+}
+
+$atelier = get_atelier($id);
+if ($atelier) {
+    atelier_action_state($atelier);
 }
 
 ?>
@@ -161,51 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <!-- # Action -->
 
-                <div class="mt-2">
-                    <h3><b>Actions :</b></h3>
-                    <?php
-                    if ($atelier["state"] == 'creation') {
-                       ?>
-                       <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>">Ouvrir les candidatures pour les praticiens</a><br>
-                       <div class="flex">
-                        <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
-                        <?php
-                        info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
-                        if (isset($_GET['action']) && $_GET['action'] === 'setStateOpen' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
-                            $result = set_state_atelier($atelier['id'], 'pending');
-                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
-                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
-                        }
-                        if (isset($_GET['action']) && $_GET['action'] === 'setStateValidate' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
-                            $result = set_state_atelier($atelier['id'], 'validate');
-                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
-                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
-                        }?>
-                       </div>
-                       <?php
-                    } else if ($atelier["state"] == "pending") {
-                        ?>
-                        <div class="flex">
-                        <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
-                        <?php
-                        info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
-                        if (isset($_GET['action']) && $_GET['action'] === 'setStateValidate' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
-                            $result = set_state_atelier($atelier['id'], 'validate');
-                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
-                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
-                        }?>
-                       </div>
-                       <?php
-                    }
-                    ?>
-                    <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a>
-                    <?php
-                    if (isset($_GET['action']) && $_GET['action'] === 'deleteAtelier' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
-                            $result = del_atelier($atelier['id']);
-                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
-                            header("Location: .?id={$atelier['id']}&infoMsg={$result}");
-                    }?>
-                </div>
+                <?php atelier_actions_admin($atelier); ?>
             </div>
         </div>
     </div>

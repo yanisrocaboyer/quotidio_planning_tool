@@ -1,6 +1,7 @@
 <?php
 require_once './functions/connection.php';
 require_once './functions/atelier.php';
+require_once './components/client/atelier.php';
 
 $user = verif_token($_SESSION["token"]);
 $access = $user["type"];
@@ -23,39 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $TITLE = "Quotidio Planning - Partenaire";
-
-function formatFrenchDate($dt) {
-    $days = [
-        'Monday'    => 'Lundi',
-        'Tuesday'   => 'Mardi',
-        'Wednesday' => 'Mercredi',
-        'Thursday'  => 'Jeudi',
-        'Friday'    => 'Vendredi',
-        'Saturday'  => 'Samedi',
-        'Sunday'    => 'Dimanche'
-    ];
-    $months = [
-        'January'   => 'Janvier',
-        'February'  => 'Février',
-        'March'     => 'Mars',
-        'April'     => 'Avril',
-        'May'       => 'Mai',
-        'June'      => 'Juin',
-        'July'      => 'Juillet',
-        'August'    => 'Août',
-        'September' => 'Septembre',
-        'October'   => 'Octobre',
-        'November'  => 'Novembre',
-        'December'  => 'Décembre',
-    ];
-    $jourEn = $dt->format('l');
-    $moisEn = $dt->format('F');
-    $jour = isset($days[$jourEn]) ? $days[$jourEn] : $jourEn;
-    $mois = isset($months[$moisEn]) ? $months[$moisEn] : $moisEn;
-    $jourNum = $dt->format('d');
-    $heure = $dt->format('H\hi');
-    return ucfirst($jour) . " {$jourNum} " . ucfirst($mois) . " à {$heure}";
-}
 ?>
 <div class="dashboard">
     <div class="dashboard-content">
@@ -71,58 +39,7 @@ function formatFrenchDate($dt) {
                 ?>
                 <div class="grid grid-cols-2 gap-4">
                     <?php foreach ($ateliers_futur as $atelier): ?>
-                    <div class="atelier">
-                        <div class="ml-2 mt-1 mb-1">
-                            <h2>
-                                <?php
-                                    $dt = new DateTime($atelier['date_hours']);
-                                    echo formatFrenchDate($dt);
-                                ?>
-                            </h2>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">person</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        $praticien = get_praticien($atelier['praticien_id']);
-                                        if (isset($praticien['name']) && !empty($praticien['name'])) {
-                                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
-                                        } else {
-                                            echo "A définir";
-                                        }
-                                    ?>
-                                </p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">draw</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['type']) ?></p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">timer</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        echo isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue";
-                                    ?>
-                                </p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">groups_2</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">notes</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        $clientNote = get_client_note($atelier['client_id']);
-                                        if (empty($clientNote) || empty($clientNote['note'])) {
-                                            echo "Aucun commentaire";
-                                        } else {
-                                            echo htmlspecialchars($clientNote["note"]);
-                                        }
-                                    ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        <?php echo atelier_card_client($atelier); ?>
                     <?php endforeach; ?>
                 </div>
                 <h2 class="mt-2" id="pass">Ateliers passés</h2>
@@ -131,58 +48,7 @@ function formatFrenchDate($dt) {
                 ?>
                 <div class="grid grid-cols-2 gap-4">
                     <?php foreach ($ateliers_pass as $atelier): ?>
-                    <div class="atelier">
-                        <div class="ml-2 mt-1 mb-1">
-                            <h2>
-                                <?php
-                                    $dt = new DateTime($atelier['date_hours']);
-                                    echo formatFrenchDate($dt);
-                                ?>
-                            </h2>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">person</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        $praticien = get_praticien($atelier['praticien_id']);
-                                        if (isset($praticien['name']) && !empty($praticien['name'])) {
-                                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
-                                        } else {
-                                            echo "A définir";
-                                        }
-                                    ?>
-                                </p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">draw</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['type']) ?></p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">timer</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        echo isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue";
-                                    ?>
-                                </p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">groups_2</span>
-                                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
-                            </div>
-                            <div class="flex">
-                                <span class="material-symbols-outlined">notes</span>
-                                <p class="mt-auto mb-auto ml-1">
-                                    <?php
-                                        $clientNote = get_client_note($atelier['client_id']);
-                                        if (empty($clientNote) || empty($clientNote['note'])) {
-                                            echo "Aucun commentaire";
-                                        } else {
-                                            echo htmlspecialchars($clientNote["note"]);
-                                        }
-                                    ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        <?php echo atelier_card_client($atelier); ?>
                     <?php endforeach; ?>
                 </div>
             </div>
