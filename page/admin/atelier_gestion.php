@@ -1,6 +1,8 @@
 <?php
 require_once './functions/connection.php';
 require_once './functions/atelier.php';
+require_once './functions/info.php';
+
 error_reporting(E_ALL & ~E_WARNING);
 
 
@@ -29,13 +31,13 @@ if (!isset($_GET["id"])) {
 $id = $_GET["id"];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $result = edit_client($id, $_POST);
+    $result = edit_atelier($id, $_POST);
 
     if ($result != "error") {
-        header("Location: ?id={$id}&error=clientUpdateSuccess");
+        header("Location: ?id={$id}&error=atelierUpdateSuccess");
         exit;
     } else {
-        header("Location: ?id={$id}&error=clientUpdateFailed&msg=". $result);
+        header("Location: ?id={$id}&error=atelierUpdateFailed&msg=". $result);
     }
 }
 
@@ -53,21 +55,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $atelier_id = $atelier["id"];
                 ?>
                 <h2>Gestion d'atelier</h2>
-                <div class="mt-2">
-                    <?php
-                    if (isset($_GET["error"]) && $_GET["error"] == "clientUpdateFailed") {
-                        echo "<p class='text-red-500'>Error lors de l'édition du client: {$_GET['msg']} </p>";
-                    } else if (isset($_GET["error"]) && $_GET["error"] == "clientUpdateSuccess") {
-                        echo "<p class='text-green-600'>Mise à jour du client réussis !</p>";
-                    } else if (isset($_GET["infoMsg"])) {
-                        echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
-                    }
-                    ?>
-                    <h3 ><b>Informations :</b></h3>
-                    <form method="POST">
+                <?php
+                if (isset($_GET["infoMsg"])) {
+                    echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
+                }
+                ?>
+
+                <!-- # Informations -->
+
+                <form method="POST"">
+                    <div class="mt-2">
+                        <?php
+                        if (isset($_GET["error"]) && $_GET["error"] == "atelierUpdateFailed") {
+                            echo "<p class='text-red-500'>Error lors de l'édition de l'atelier: {$_GET['msg']} </p>";
+                        } else if (isset($_GET["error"]) && $_GET["error"] == "atelierUpdateSuccess") {
+                            echo "<p class='text-green-600'>Mise à jour de l'atelier réussis !</p>";
+                        } else if (isset($_GET["infoMsg"])) {
+                            echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
+                        }
+                        ?>
+                        <h3 ><b>Informations :</b></h3>
                         <div>
                             <label for="typeInput">Type:</label>
-                            <input type="text" id="typeInput" name="typeInput" value="<?php echo htmlspecialchars($atelier['type']) ?>" required>
+                            <input type="text" id="typeInput" name="typeInput" value="<?php echo htmlspecialchars($atelier['type']) ?>" required  <?php if ($atelier['state'] === 'validate') echo 'disabled'; ?>>
                         </div>
                         <?php 
                         $date_hours = $atelier['date_hours'];
@@ -79,30 +89,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             $date = '';
                             $hour = '';
                         }
-             
+                
                         ?>
                         <div>
-                            <label for="dateInput">Date et heure:</label>
-                            <input type="date" id="dateInput" name="dateInput" value="<?php echo htmlspecialchars($date) ?>" required>
+                            <label for="dateInput">Date:</label>
+                            <input type="date" id="dateInput" name="dateInput" value="<?php echo htmlspecialchars($date) ?>" required >
                         </div>
                         <div>
-                            <label for="hourInput">Date et heure:</label>
+                            <label for="hourInput">Heure:</label>
                             <input type="time" id="hourInput" name="hourInput" value="<?php echo htmlspecialchars($hour) ?>" required>
                         </div>
                         <div>
                             <label for="maxPartInput">Participants maximum:</label>
-                            <input type="num" id="maxPartInput" name="maxPartInput" value="<?php echo htmlspecialchars($atelier['max_participants']) ?>" required>
+                            <input type="num" id="maxPartInput" name="maxPartInput" value="<?php echo htmlspecialchars($atelier['max_participants']) ?>" required <?php if ($atelier['state'] === 'validate') echo 'disabled'; ?>>
                         </div>
                         <div>
                             <label for="partInput">Participants:</label>
-                            <input type="num" id="partInput" name="partInput" value="<?php $atelier['participants'] ?>" required>
+                            <input type="num" id="partInput" name="partInput" value="<?php $atelier['participants'] ?>">
                         </div>
-                        <button class="mt-2 underline" type="submit">Modifier les informations</button>
-                    </form>
-                </div>
-                <div class="mt-2">
-                    <h3><b>Afiliations :</b></h3>
-                    <form method="POST">
+                    </div>
+                    <div class="mt-2" id="affilations">
+                        <h3><b>Afiliations :</b></h3>
                         <?php
                         $clients = get_clients();
                         $selected_client_id = isset($atelier['client_id']) ? $atelier['client_id'] : null;
@@ -117,32 +124,88 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         $client_id = htmlspecialchars($client['id']);
                                         $client_name = htmlspecialchars($client['name']);
                                         $selected = ($client_id == $selected_client_id) ? 'selected' : '';
-                                        echo "<option value=\"$client_id\" $selected>$client_name</option>";
+                                        $disabled = ($atelier['state'] === 'validate') ? 'disabled' : '';
+                                        echo "<option value=\"$client_id\" $selected $disabled>$client_name</option>";
                                     }
                                 }
-                            $praticiens = get_praticiens("validate");
-                            $selected_praticien_id = isset($atelier['praticien_id']) ? $atelier['praticien_id'] : null;
                             ?>
                             </select>
                         </div>
                         <div>
                             <label for="praticienInput">Praticien:</label>
-                            <select name="praticienInput" id="praticienInput" required>
+                            <select name="praticienInput" id="praticienInput">
                                 <option value="" disabled selected>Sélectionner un praticien</option>
                                 <?php
-                                if ($praticiens && is_array($praticien)) {
-                                    foreach ($clients as $client) {
+                                $praticiens = get_praticiens("validate");
+                                $selected_praticien_id = isset($atelier['praticien_id']) ? $atelier['praticien_id'] : null;
+                                if ($praticiens && is_array($praticiens)) {
+                                    foreach ($praticiens as $praticien) {
                                         $praticien_id = htmlspecialchars($praticien['id']);
                                         $praticien_surname = htmlspecialchars($praticien['surname']);
                                         $praticien_name = htmlspecialchars($praticien['name']);
                                         $selected = ($praticien_id == $selected_praticien_id) ? 'selected' : '';
-                                        echo "<option value=\"$praticien_id\" $selected>$praticien_name $praticien_surname</option>";
-                                
+                                        $selected = ($praticien_id == $selected_praticien_id) ? 'selected' : '';
+                                        $disabled = ($atelier['state'] === 'validate') ? 'disabled' : '';
+                                        echo "<option value=\"$praticien_id\" $selected $disabled>$praticien_name $praticien_surname</option>";                                
                                     }
                                 }
                                 ?>
                             </select>
-                    </form>
+                    <br><button class="mt-2 underline" type="submit">Modifier les informations</button>
+                    </div>
+                </form>
+
+                <div class="mt-2">
+                    <h3><b>Candidatures :</b></h3>
+                </div>
+
+                <!-- # Action -->
+
+                <div class="mt-2">
+                    <h3><b>Actions :</b></h3>
+                    <?php
+                    if ($atelier["state"] == 'creation') {
+                       ?>
+                       <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>">Ouvrir les candidatures pour les praticiens</a><br>
+                       <div class="flex">
+                        <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
+                        <?php
+                        info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
+                        if (isset($_GET['action']) && $_GET['action'] === 'setStateOpen' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
+                            $result = set_state_atelier($atelier['id'], 'pending');
+                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
+                        }
+                        if (isset($_GET['action']) && $_GET['action'] === 'setStateValidate' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
+                            $result = set_state_atelier($atelier['id'], 'validate');
+                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
+                        }?>
+                       </div>
+                       <?php
+                    } else if ($atelier["state"] == "pending") {
+                        ?>
+                        <div class="flex">
+                        <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
+                        <?php
+                        info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
+                        if (isset($_GET['action']) && $_GET['action'] === 'setStateValidate' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
+                            $result = set_state_atelier($atelier['id'], 'validate');
+                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                            header("Location: ?id={$atelier['id']}&infoMsg={$result}");
+                        }?>
+                       </div>
+                       <?php
+                    }
+                    ?>
+                    <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a>
+                    <?php
+                    if (isset($_GET['action']) && $_GET['action'] === 'deleteAtelier' && isset($_GET['id']) && $_GET['id'] == $atelier["id"]) {
+                            $result = del_atelier($atelier['id']);
+                            echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
+                            header("Location: .?id={$atelier['id']}&infoMsg={$result}");
+                    }?>
+                </div>
             </div>
         </div>
     </div>

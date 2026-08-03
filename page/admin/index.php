@@ -163,6 +163,19 @@ function formatFrenchDate($dt) {
                                 <span class="material-symbols-outlined">person</span>
                                 <p class="mt-auto mb-auto ml-1">
                                     <?php
+                                        $praticien = get_praticien($atelier['praticien_id']);
+                                        if (isset($praticien['name']) && !empty($praticien['name'])) {
+                                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
+                                        } else {
+                                            echo "A définir";
+                                        }
+                                    ?>
+                                </p>
+                            </div>
+                            <div class="flex">
+                                <span class="material-symbols-outlined">location_on</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
                                         echo isset($clients[$atelier['client_id']]) && !empty($clients[$atelier['client_id']]) ? htmlspecialchars($clients[$atelier['client_id']]) : "A définir";
                                     ?>
                                 </p>
@@ -182,6 +195,19 @@ function formatFrenchDate($dt) {
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
                                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants'])?> Personnes</p>
+                            </div>
+                            <div class="flex">
+                                <span class="material-symbols-outlined">notes</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
+                                        $clientNote = get_client_note($atelier['client_id']);
+                                        if (empty($clientNote) || empty($clientNote['note'])) {
+                                            echo "Aucun commentaire";
+                                        } else {
+                                            echo htmlspecialchars($clientNote["note"]);
+                                        }
+                                    ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -206,6 +232,19 @@ function formatFrenchDate($dt) {
                                 <span class="material-symbols-outlined">person</span>
                                 <p class="mt-auto mb-auto ml-1">
                                     <?php
+                                        $praticien = get_praticien($atelier['praticien_id']);
+                                        if (isset($praticien['name']) && !empty($praticien['name'])) {
+                                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
+                                        } else {
+                                            echo "A définir";
+                                        }
+                                    ?>
+                                </p>
+                            </div>
+                            <div class="flex">
+                                <span class="material-symbols-outlined">location_on</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
                                         echo isset($clients[$atelier['client_id']]) && !empty($clients[$atelier['client_id']]) ? htmlspecialchars($clients[$atelier['client_id']]) : "A définir";
                                     ?>
                                 </p>
@@ -225,6 +264,19 @@ function formatFrenchDate($dt) {
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
                                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?> Personnes</p>
+                            </div>
+                            <div class="flex">
+                                <span class="material-symbols-outlined">notes</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
+                                        $clientNote = get_client_note($atelier['client_id']);
+                                        if (empty($clientNote) || empty($clientNote['note'])) {
+                                            echo "Aucun commentaire";
+                                        } else {
+                                            echo htmlspecialchars($clientNote["note"]);
+                                        }
+                                    ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -243,9 +295,22 @@ function formatFrenchDate($dt) {
                                     $dt = new DateTime($atelier['date_hours']);
                                     echo formatFrenchDate($dt);
                                 ?>
-                            </h2>
+                            </h2>    
                             <div class="flex">
                                 <span class="material-symbols-outlined">person</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
+                                        $praticien = get_praticien($atelier['praticien_id']);
+                                        if (isset($praticien['name']) && !empty($praticien['name'])) {
+                                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
+                                        } else {
+                                            echo "A définir";
+                                        }
+                                    ?>
+                                </p>
+                            </div>                                    
+                            <div class="flex">
+                                <span class="material-symbols-outlined">location_on</span>
                                 <p class="mt-auto mb-auto ml-1">
                                     <?php
                                         echo isset($clients[$atelier['client_id']]) && !empty($clients[$atelier['client_id']]) ? htmlspecialchars($clients[$atelier['client_id']]) : "A définir";
@@ -267,6 +332,19 @@ function formatFrenchDate($dt) {
                             <div class="flex">
                                 <span class="material-symbols-outlined">groups_2</span>
                                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?> Personnes</p>
+                            </div>
+                            <div class="flex">
+                                <span class="material-symbols-outlined">notes</span>
+                                <p class="mt-auto mb-auto ml-1">
+                                    <?php
+                                        $clientNote = get_client_note($atelier['client_id']);
+                                        if (empty($clientNote) || empty($clientNote['note'])) {
+                                            echo "Aucun commentaire";
+                                        } else {
+                                            echo htmlspecialchars($clientNote["note"]);
+                                        }
+                                    ?>
+                                </p>
                             </div>
                         </div>
                     </div>

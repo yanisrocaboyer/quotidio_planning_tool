@@ -24,6 +24,12 @@
                 <p class="ml-1">Ateliers passés</p>
             </a>
         </div>
+        <div>
+            <a href="/praticien/index#candidatures" class="flex items-center mt-2 text-primary hover:text-secondary">
+                <span class="material-symbols-outlined">checkbook</span>
+                <p class="ml-1">Participations</p>
+            </a>
+        </div>
     </div>
     <div class="text-xl mt-auto pt-3 bg-secondary rounded-t-xl">
         <div class="ml-5 mb-5">
