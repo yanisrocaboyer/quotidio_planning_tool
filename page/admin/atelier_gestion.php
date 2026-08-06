@@ -162,6 +162,34 @@ if ($atelier) {
 
                 <div class="mt-2">
                     <h3><b>Candidatures :</b></h3>
+                    <?php
+                    $candidatures = get_participations_atelier($atelier_id);
+                    $hasPending = false;
+                    foreach ($candidatures as $candidature) {
+                        if ($candidature["state"] == "pending") {
+                            $hasPending = true;
+                            $praticien = get_praticien($candidature["praticien_id"]);
+                            ?>
+                            <div class="partenaire_card">
+                                <div>
+                                    <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
+                                </div>
+                                <div class="ml-3 leading-none mt-auto mb-auto">
+                                    <p><a href="user_gestion?type=praticien&user_id=<?= $praticien["id"] ?>" target="_blank">Candidature de: <?= $praticien["name"] ?> <?= $praticien["surname"] ?></a></p>
+                                    <div class="flex mt-1">
+                                        <p><a href="?id=<?= $id ?>&action=candidateAccept&pid=<?= $candidature["id"]?>&uid=<?= $praticien["id"]?>">Accepter</a></p>
+                                        <p><a class="ml-2" href="?id=<?= $id ?>&action=candidateRefuse&pid=<?= $candidature["id"]?>">Refuser</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                    }
+                    if (!$hasPending) {
+                        echo "<p>Aucune</p>";
+                    }
+                    ?>
+               
                 </div>
 
                 <!-- # Action -->

@@ -7,6 +7,7 @@ $TITLE = "Quotidio Planning - 404";
         <div>
             <h1 class="text-2xl text-center mt-5">Erreur 404<h1>
             <h3 class="text-center">Oh.. La page que vous avez cherchée n'a pas été trouvée</h3>
+            <center><a class="text-center" href="/index">Revenir à la page de connexion</a></center>
         </div>
     </div>
 </div>

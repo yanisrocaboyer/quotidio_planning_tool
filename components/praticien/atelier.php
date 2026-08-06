@@ -6,19 +6,26 @@ require_once __DIR__ . '/../../functions/info.php';
 
 function atelier_card_praticien($atelier, $variant = 'futur') {
     $candidatable = ($variant === 'disponible');
+    $candidate = ($variant === 'candidature');
 
     ob_start();
     ?>
     <?php if ($candidatable): ?>
     <a href="?action=candidateAtelier&atelier_id=<?= $atelier['id'] ?>">
+    <?php endif; 
+    if ($candidate): ?>
+    <a href="?action=delCandidateAtelier&atelier_id=<?= $atelier['id'] ?>">
     <?php endif; ?>
     <div class="atelier">
         <div class="ml-2 mt-1 mb-1">
-            <h2 class="<?= $candidatable ? 'flex' : '' ?>">
+            <h2 class="<?= ($candidatable || $candidate) ? 'flex' : '' ?>">
                 <?php
                     echo format_french_date(new DateTime($atelier['date_hours']));
                     if ($candidatable) {
                         info("Cliquer sur l'atelier pour y participer");
+                    }
+                    else if ($candidate) {
+                        info("Cliquer sur l'atelier pour supprimer votre candidature");
                     }
                 ?>
             </h2>
@@ -75,7 +82,7 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
             </div>
         </div>
     </div>
-    <?php if ($candidatable): ?>
+    <?php if ($candidatable || $candidate): ?>
     </a>
     <?php endif; ?>
     <?php
@@ -95,5 +102,21 @@ function atelier_action_candidature($praticien_id) {
 
     add_participation_atelier($atelier['id'], $praticien_id);
     header("Location: ?msg=candidateAccept#candidatures");
+    exit;
+}
+
+function atelier_action_delCandidature($praticien_id) {
+    if (!isset($_GET['action']) || $_GET['action'] !== 'delCandidateAtelier' || !isset($_GET['atelier_id'])) {
+        return;
+    }
+
+    $atelier = get_atelier($_GET['atelier_id']);
+    if (!$atelier || $atelier['state'] != "pending") {
+        header("Location: ?msg=errorCandidateAccept#candidatures");
+        exit;
+    }
+
+    delete_participation_atelier($atelier['id'], $praticien_id);
+    header("Location: ?msg=candidatureDeleted#candidatures");
     exit;
 }

@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 atelier_action_candidature($praticien_user['id']);
+atelier_action_delCandidature($praticien_user['id']);
 
 $TITLE = "Quotidio Planning - Praticien";
 ?>
@@ -57,7 +58,9 @@ $TITLE = "Quotidio Planning - Praticien";
                 <?php
                 if (isset($_GET["msg"])) {
                     if ($_GET["msg"] == "candidateAccept") {
-                        echo "<p class='text-green-600'>Votre candidature a été enregistré avec succès !</p>";
+                        echo "<p class='text-green-600'>Votre candidature a été enregistrer avec succès !</p>";
+                    } else if ($_GET["msg"] == "candidatureDeleted") {
+                        echo "<p class='text-green-600'>Votre candidature a été supprimer avec succès !</p>";
                     } else if ($_GET["msg"] == "errorCandidateAccept") {
                         echo "<p class='text-red-500'>Oups.. Une erreur est survenue lors de l'enrengistrement de votre candidature.</p>";
                     }
@@ -77,17 +80,30 @@ $TITLE = "Quotidio Planning - Praticien";
                 </div>
                 <h2 class="mt-2">Ateliers disponibles</h2>
                 <?php
-                $ateliers_pass = get_ateliers("pending", "praticien");
+                $ateliers_disponibles = get_ateliers("pending", "praticien");
                 ?>
                 <div class="grid grid-cols-2 gap-4">
-                    <?php if (empty($ateliers_pass)): ?>
-                        <p style="grid-column: 1 / -1;">Aucune</p>
-                    <?php else: ?>
-                        <?php foreach ($ateliers_pass as $atelier): ?>
+                    <?php
+                    $found = false;
+                    if (!empty($ateliers_disponibles)):
+                        foreach ($ateliers_disponibles as $atelier):
+                            $participation_exist = get_participations_ap($atelier['id'], $praticien_user["id"]);
+                            if (!empty($participation_exist)) {
+                                continue; 
+                            }
+                            $found = true;
+                    ?>
                         <?php echo atelier_card_praticien($atelier, 'disponible'); ?>
-                        <?php endforeach; ?>
+                    <?php
+                        endforeach;
+                    endif;
+
+                    if (!$found):
+                    ?>
+                        <p style="grid-column: 1 / -1;">Aucun (ou aucun dont vous n'avez pas candidaté)</p>
                     <?php endif; ?>
                 </div>
+        
            
             </div>
         </div>

@@ -204,19 +204,44 @@ function get_participations_praticien($praticien_id, $limit="100") {
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function get_participations_ap($atelier_id, $praticien_id) {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM participation_atelier WHERE atelier_id = :atelier_id AND praticien_id = :praticien_id");
+    $request->execute(["atelier_id" => $atelier_id, "praticien_id" => $praticien_id]);
+    return $request->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function add_participation_atelier($atelier_id, $praticien_id) {
     global $sql;
     $request = $sql->prepare("INSERT INTO participation_atelier (atelier_id, praticien_id, state) VALUES (:atelier_id, :praticien_id, 'pending')");
     $request->execute(["atelier_id" => $atelier_id, "praticien_id" => $praticien_id]);
 }
 
-function delete_participation_atelier($id) {
+function delete_participation_atelier($atelier_id, $praticien_id) {
     global $sql;
-    $request = $sql->prepare("DELETE FROM participation_atelier WHERE id = :id");
-    $request->execute(["id" => $id]);
+    $request = $sql->prepare("DELETE FROM participation_atelier WHERE atelier_id = :atelier_id AND praticien_id = :praticien_id");
+    $request->execute(["atelier_id" => $atelier_id, "praticien_id" => $praticien_id]);
 }
 
-# Author
+function set_participation_state($id, $state, $aid, $uid = NULL) {
+    global $sql;
+    $request = $sql->prepare("UPDATE participation_atelier SET state = :state WHERE id = :id");
+    $request->execute(["state" => $state, "id" => $id]);
+    if ($state === "accept") {
+        $request = $sql->prepare("UPDATE atelier SET praticien_id = :praticien_id WHERE id = :id");
+        $request->execute([
+            "praticien_id" => $uid,
+            "id" => $aid
+        ]);
+        $request = $sql->prepare("UPDATE participation_atelier SET state = 'refuse' WHERE atelier_id = :atelier_id AND id != :id");
+        $request->execute([
+            "atelier_id" => $aid,
+            "id" => $id
+        ]);
+    }
+}
+
+# Other
 
 function get_client_note($client_id) {
     global $sql;

@@ -96,6 +96,18 @@ function atelier_actions_admin($atelier) {
         <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a>
     </div>
     <?php
+    if (isset($_GET['action']) && isset($_GET['pid']) && isset($_GET['id'])) {
+        $id = $_GET['id'];
+        $pid = $_GET['pid'];
+        if ($_GET['action'] === 'candidateAccept') {
+            set_participation_state($pid, 'accept', $id, $_GET["uid"]);
+            header("Location: ?id={$id}&msg=candidateAcceptSuccess");
+        } elseif ($_GET['action'] === 'candidateRefuse') {
+            set_participation_state($pid, 'refuse', $id);
+            header("Location: ?id={$id}&msg=candidatureRefuseSuccess");
+        }
+   
+    }
 }
 
 function atelier_action_state($atelier) {

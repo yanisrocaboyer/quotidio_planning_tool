@@ -28,14 +28,14 @@ $TITLE = "Quotidio Planning - Admin";
                 $pending_praticiens = get_praticiens("pending");
                 foreach($pending_praticiens as $praticien) {
                     ?>
-                    <a href="/page/admin/user_gestion.php?type=praticien&user_id=<?php echo $praticien['id'] ?>">
+                    <a href="/page/admin/user_gestion.php?type=praticien&user_id=<?= $praticien['id'] ?>">
                         <div class="partenaire_card">
                             <div>
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
                             </div>
                             <div class="ml-3 leading-none mt-auto mb-auto">
-                                <p class="text-lg/4"><?php echo $praticien["name"] ?> <?php echo $praticien["surname"] ?></p>
-                                <p class="text-sm/4"><?php echo $praticien["email"] ?></p>
+                                <p class="text-lg/4"><?= $praticien["name"] ?> <?= $praticien["surname"] ?></p>
+                                <p class="text-sm/4"><?= $praticien["email"] ?></p>
                             </div>
                         </div>
                     </a>

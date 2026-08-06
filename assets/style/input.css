@@ -106,6 +106,14 @@ body {
     @apply pr-1
 }
 
+.partenaire_card a {
+    @apply text-black
+}
+
+.partenaire_card:hover a {
+    @apply text-white
+}
+
 /* Responsive Dashboard */
 @media (max-width: 640px) {
     .dashboard-content {
