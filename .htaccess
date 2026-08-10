@@ -4,39 +4,24 @@ RewriteBase /
 RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|meta-webindexer|Applebot) [NC]
 RewriteRule ^ - [F,L]
 
-# Delete page if page in url (première occurrence)
-RewriteRule ^page/(.*)$ /$1 [L,R=301]
+RewriteRule ^page/(.*)$ $1 [L,R=301]
+RewriteRule ^components/(.*)$ $1 [L,R=301]
+RewriteRule ^layout/(.*)$ $1 [L,R=301]
+RewriteRule ^other/(.*)$ $1 [L,R=301]
 
-# Delete page if page in url (première occurrence)
-RewriteRule ^components/(.*)$ /$1 [L,R=301]
-
-# Delete page if page in url (première occurrence)
-RewriteRule ^layout/(.*)$ /$1 [L,R=301]
-
-# Delete page if page in url (première occurrence)
-RewriteRule ^other/(.*)$ /$1 [L,R=301]
-
-# Redirect to index if not file specified in url
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !\.\w{2,4}$
-RewriteRule ^(.*)/$ /$1/index [L,R=301]
+RewriteRule ^(.*)/$ $1/index [L,R=301]
 
-# Delete .php extension
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)\.php$ /$1 [L,R=301]
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /yanis/(.*)\.php\ HTTP/
+RewriteRule ^(.*)\.php$ $1 [R=301,L]
 
-# Redirect empty request to index
 RewriteRule ^$ index [L]
 
-# Redirect request to index.php (fallback)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [L,QSA,NC]
-
-# Redirect request to index.php with "url" parameter
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^url/(.+)$ index.php?url=$1 [L,QSA,NC]
 
-
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [L,QSA,NC]

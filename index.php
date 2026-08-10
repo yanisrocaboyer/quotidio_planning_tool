@@ -8,6 +8,9 @@ $dotenv->load();
 session_start();
 $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
+// Base URL (ex: "/yanis" sans slash final)
+$base_url = "";
+
 // Default values
 $layout = './layout/default.php';
 $maintenance = false;

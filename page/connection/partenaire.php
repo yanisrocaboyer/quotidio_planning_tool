@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 if (isset($_SESSION["token"])) {
-    header("Location: /page/partenaire/");
+    header("Location: " . $base_url . "/page/partenaire/");
     exit();
 }
 

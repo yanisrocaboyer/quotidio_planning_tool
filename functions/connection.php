@@ -3,7 +3,7 @@ require_once 'generation.php';
 require_once 'db.php';
 
 function login($username, $password, $type) {
-    global $sql;
+    global $sql, $base_url;
     try {
         $sqlQuery = "SELECT * FROM users WHERE identifiant = :username LIMIT 1";
         $sqlRequest = $sql->prepare($sqlQuery);
@@ -14,7 +14,7 @@ function login($username, $password, $type) {
 
         if($sqlResult && password_verify($password, $sqlResult['password'])) {
             $_SESSION['token'] = $sqlResult['token'];
-            header('Location: /page/'. $type .'/');
+            header('Location: ' . $base_url . '/page/' . $type . '/');
         } else {
             header("Location: ?err=INVALID_USER");
         }
