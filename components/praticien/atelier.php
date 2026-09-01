@@ -16,7 +16,7 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
     if ($candidate): ?>
     <a href="?action=delCandidateAtelier&atelier_id=<?= $atelier['id'] ?>">
     <?php endif; ?>
-    <div class="atelier">
+    <div class="atelier <?= $variant ?>">
         <div class="ml-2 mt-1 mb-1">
             <h2 class="<?= ($candidatable || $candidate) ? 'flex' : '' ?>">
                 <?php
@@ -30,13 +30,13 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
                 ?>
             </h2>
             <?php if ($variant === 'futur'): ?>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">person</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?php
                         $client = get_client($atelier['client_id']);
                         if (isset($client['name']) && !empty($client['name'])) {
-                            echo htmlspecialchars($client['name']);
+                            echo $client['name'];
                         } else {
                             echo "A définir";
                         }
@@ -50,7 +50,7 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
                     <?php
                         $client = get_client($atelier['client_id']);
                         if (isset($client['adress'])) {
-                            echo htmlspecialchars($client['adress']);
+                            echo $client['adress'];
                         } else {
                             echo "A définir";
                         }
@@ -60,9 +60,9 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
             <?php endif; ?>
             <div class="flex">
                 <span class="material-symbols-outlined">draw</span>
-                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['type']) ?></p>
+                <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">timer</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?php
@@ -70,11 +70,11 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
                     ?>
                 </p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">groups_2</span>
                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">notes</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?= atelier_client_note($atelier['client_id']) ?>

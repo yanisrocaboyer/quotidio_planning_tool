@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $register_result = register($_POST, $_FILES);
 
     if ($register_result['success']) {
-        header("Location: ../praticien/inscription_success.php");
+        header("Location: ../praticien/inscription_success");
         exit;
     } else if (!empty($register_result['errors'])) {
         $form_errors = $register_result['errors'];

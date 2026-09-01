@@ -19,7 +19,7 @@
             </a>
         </div>
         <div>
-            <a href="/admin/index#future" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/index#futur" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">event_upcoming</span>
                 <p class="ml-1">Ateliers à venir</p>
             </a>
@@ -33,13 +33,13 @@
         <p class="mt-7">Gestions</p>
         <hr class="text-gray-300">
         <div>
-            <a href="/admin/client_gestion.php" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/client_gestion" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">account_circle</span>
                 <p class="ml-1">Gestion des partenaires</p>
             </a>
         </div>
         <div>
-            <a href="/admin/praticien_gestion.php" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/admin/praticien_gestion" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">identity_platform</span>
                 <p class="ml-1">Gestion des praticiens</p>
             </a>
@@ -54,7 +54,7 @@
                 </a>
             </div>
             <div>
-                <a href="../logout.php" class="flex items-center mt-1 logout">
+                <a href="../logout" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="ml-1">Déconnexion</p>
                 </a>

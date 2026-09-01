@@ -39,5 +39,5 @@ function atelier_client_note($client_id) {
     if (empty($clientNote) || empty($clientNote['note'])) {
         return "Aucun commentaire";
     }
-    return htmlspecialchars($clientNote["note"]);
+    return $clientNote["note"];
 }

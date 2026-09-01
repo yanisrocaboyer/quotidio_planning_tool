@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-body {
-    overflow-x: hidden;
-}
-
 @theme {
     --color-primary: #17365d;
     --color-secondary: #45667d;
@@ -47,17 +43,22 @@ body {
 }
 
 /* Dashboard */
+
 .dashboard {
     @apply w-full min-h-screen flex justify-center items-center;
+    overflow: auto; 
 }
+
 .dashboard-content {
     @apply flex flex-row w-[97vw] h-[90vh] rounded-lg shadow-lg items-stretch;
     background: #a3e3e3;
     background: linear-gradient(133deg, rgb(163, 210, 227) 0%, rgba(163, 227, 227, 1) 50%, rgb(183, 228, 228) 100%);
 }
+
 .side-bar {
     @apply flex flex-col h-full w-1/4 min-w-[300px] max-w-[500px] bg-white rounded-l-lg overflow-y-auto select-none;
 }
+
 .content {
     @apply flex flex-col h-[calc(100%-50px)] bg-white shadow-lg rounded-lg overflow-y-scroll overflow-x-hidden mt-auto mb-auto relative;
 
@@ -82,9 +83,33 @@ body {
     @apply w-[100%] ml-[10px] mr-[10px];
 }
 
+/* Atelier */
+
 .atelier {
-    @apply border-secondary border-2 p-2 mt-2 mr-5 text-black rounded-2xl
+    @apply border-2 p-2 mt-2 mr-5 text-black rounded-2xl;
 }
+
+.atelier.pending {
+    @apply border-orange-500;
+}
+
+.atelier.futur {
+    @apply border-green-500;
+}
+
+.atelier.pass {
+    @apply border-secondary;
+}
+
+.atelier .atelier-hidden {
+    @apply hidden opacity-0 overflow-hidden transition-[max-height,opacity] duration-350 ease-in-out;
+}
+
+.atelier:hover .atelier-hidden {
+    @apply flex opacity-100 transition-[max-height,opacity] duration-350 ease-in-out;
+}
+
+/* Popup */ 
 
 .popup {
     @apply absolute inset-0 w-full h-full bg-green1/50 rounded-lg shadow-lg z-50 flex backdrop-blur-[2px];
@@ -93,6 +118,8 @@ body {
 .popup-frame {
     @apply m-auto p-10 rounded-xl bg-white shadow-xl z-100 
 }
+
+/* Partenaire */
 
 .partenaire_card {
     @apply flex border-secondary bg-mist-50 border-2 p-2 mt-2 mr-5 text-black rounded-md transition 
@@ -115,6 +142,7 @@ body {
 }
 
 /* Responsive Dashboard */
+
 @media (max-width: 640px) {
     .dashboard-content {
         @apply flex-col w-full h-full rounded-none;

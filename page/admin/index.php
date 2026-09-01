@@ -23,6 +23,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $TITLE = "Quotidio Planning - Admin";
+
+if (isset($_GET["action"]) && $_GET["action"] == "set_all_creation_atelier_to_pending") {
+    set_all_creation_atelier_to_pending();
+    header("Location: ?info_msg_green=Les candidatures sont ouvertes pour tous les ateliers !");
+}
 ?>
 <div class="dashboard">
     <div class="dashboard-content">
@@ -44,7 +49,7 @@ $TITLE = "Quotidio Planning - Admin";
                                 </div>
                             </div>
                             <div class="mt-5">
-                                <p>Type d'atelier</p>
+                                <p>Type d'atelier <a href="type_gestion" target="_blank">Gérer les types</a></p>
                                 <?php
                                     $atelier_types = get_atelier_types();
                                 ?>
@@ -83,6 +88,11 @@ $TITLE = "Quotidio Planning - Admin";
                                     <input class="input-primary-small" type="num" name="maxPersonInput" placeholder="12" required/>
                                 </div>
                             </div>
+
+                            <div class="mt-5 flex">
+                                <input type="checkbox" name="candidableInput" value="1"/>
+                                <p class="ml-2">Ouvrir les candidatures</p>
+                            </div>
                             <button type="submit" class="btn-primary">Créer</button>
                         </form>
                         <button class="btn-red" id="cancelBtn">Annuler</button>
@@ -107,32 +117,37 @@ $TITLE = "Quotidio Planning - Admin";
                     <?php                   
                     }
                 }
+                if(isset($_GET["info_msg_green"])) {
+                    echo "<p class='text-green-900'>{$_GET["info_msg_green"]}</p>";
+                }
                 ?>
                 <h2 class="mt-2" id="pending">Ateliers en cours de gestion</h2>
+                <p>Actions rapides:</p>
+                <a href="?action=set_all_creation_atelier_to_pending">Ouvrir les candidatures pour tous les ateliers</a>
                 <?php
                 $ateliers_pending = get_ateliers("pending");
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_pending as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier, true); ?>
+                        <?php echo atelier_card_admin($atelier, true, "pending"); ?>
                     <?php endforeach; ?>
                 </div>
                 <h2 class="mt-2" id="futur">Ateliers à venir</h2>
                 <?php
                 $ateliers_futur = get_ateliers("futur");
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_futur as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier); ?>
+                        <?php echo atelier_card_admin($atelier, true, "futur"); ?>
                     <?php endforeach; ?>
                 </div>
                 <h2 class="mt-2" id="pass">Ateliers passés</h2>
                 <?php
                 $ateliers_pass = get_ateliers("pass");
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_pass as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier); ?>
+                        <?php echo atelier_card_admin($atelier, true, "pass"); ?>
                     <?php endforeach; ?>
                 </div>
             </div>

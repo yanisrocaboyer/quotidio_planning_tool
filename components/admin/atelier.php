@@ -4,10 +4,21 @@ require_once __DIR__ . '/../../functions/atelier.php';
 require_once __DIR__ . '/../../functions/connection.php';
 require_once __DIR__ . '/../../functions/info.php';
 
-function atelier_card_admin($atelier, $link = false) {
+function atelier_card_admin($atelier, $link = false, $type="pending") {
     ob_start();
     ?>
-    <div class="atelier">
+    <div class="atelier <?= $type ?>" style="position: relative;">
+        <?php 
+        if($type=="pending" && get_count_participations_atelier($atelier["id"])){
+            ?>
+            <span class="absolute right-[-12px] top-[-12px] z-10" style="width: 28px; height: 28px; display: inline-block;">
+                <span class="absolute inline-flex rounded-full animate-ping bg-orange-500 opacity-75" style="width: 18px; height: 18px; left: 5px; top: 5px;"></span>
+                <span class="relative inline-flex rounded-full bg-orange-500" style="width: 18px; height: 18px; left: 5px; top: 5px;"></span>
+            </span>
+       
+            <?php
+        }
+        ?>
         <div class="ml-2 mt-1 mb-1">
             <h2>
                 <?php
@@ -15,25 +26,12 @@ function atelier_card_admin($atelier, $link = false) {
                 ?>
             </h2>
             <div class="flex">
-                <span class="material-symbols-outlined">person</span>
-                <p class="mt-auto mb-auto ml-1">
-                    <?php
-                        $praticien = get_praticien($atelier['praticien_id']);
-                        if (isset($praticien['name']) && !empty($praticien['name'])) {
-                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
-                        } else {
-                            echo "A définir";
-                        }
-                    ?>
-                </p>
-            </div>
-            <div class="flex">
                 <span class="material-symbols-outlined">location_on</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?php
                         $client = get_client($atelier['client_id']);
                         if (isset($client['name']) && !empty($client['name'])) {
-                            echo htmlspecialchars($client['name']);
+                            echo $client['name'];
                         } else {
                             echo "A définir";
                         }
@@ -42,9 +40,9 @@ function atelier_card_admin($atelier, $link = false) {
             </div>
             <div class="flex">
                 <span class="material-symbols-outlined">draw</span>
-                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['type']) ?></p>
+                <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">timer</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?php
@@ -52,11 +50,24 @@ function atelier_card_admin($atelier, $link = false) {
                     ?>
                 </p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
+                <span class="material-symbols-outlined">person</span>
+                <p class="mt-auto mb-auto ml-1">
+                    <?php
+                        $praticien = get_praticien($atelier['praticien_id']);
+                        if (isset($praticien['name']) && !empty($praticien['name'])) {
+                            echo $praticien['name'] . ' ' . $praticien['surname'];
+                        } else {
+                            echo "A définir";
+                        }
+                    ?>
+                </p>
+            </div>
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">groups_2</span>
                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?> Personnes</p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">notes</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?= atelier_client_note($atelier['client_id']) ?>
@@ -118,18 +129,19 @@ function atelier_action_state($atelier) {
     switch ($_GET['action']) {
         case 'setStateOpen':
             set_state_atelier($atelier['id'], 'pending');
-            break;
+            header("Location: ?id={$atelier['id']}&infoMsg=Candidatures ouvertes");
+            exit;
         case 'setStateValidate':
             set_state_atelier($atelier['id'], 'validate');
-            break;
+            header("Location: ?id={$atelier['id']}&infoMsg=Atelier validé");
+            exit;
         case 'deleteAtelier':
             del_atelier($atelier['id']);
-            header("Location: ?id={$atelier['id']}&infoMsg=Atelier supprimé");
+            header("Location: index?id={$atelier['id']}&infoMsg=Atelier supprimé");
             exit;
         default:
             return;
     }
 
-    header("Location: ?id={$atelier['id']}&infoMsg=success");
     exit;
 }

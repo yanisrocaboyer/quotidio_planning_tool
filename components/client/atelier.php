@@ -3,10 +3,10 @@ require_once __DIR__ . '/../../functions/display.php';
 require_once __DIR__ . '/../../functions/atelier.php';
 require_once __DIR__ . '/../../functions/connection.php';
 
-function atelier_card_client($atelier) {
+function atelier_card_client($atelier, $type="futur") {
     ob_start();
     ?>
-    <div class="atelier">
+    <div class="atelier <?= $type ?>" style="position: relative;">
         <div class="ml-2 mt-1 mb-1">
             <h2>
                 <?php
@@ -14,23 +14,23 @@ function atelier_card_client($atelier) {
                 ?>
             </h2>
             <div class="flex">
+                <span class="material-symbols-outlined">draw</span>
+                <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
+            </div>
+            <div class="flex">
                 <span class="material-symbols-outlined">person</span>
-                <p class="mt-auto mb-auto ml-1">
+                <p class="mt-auto mb-auto ml-1"> 
                     <?php
                         $praticien = get_praticien($atelier['praticien_id']);
                         if (isset($praticien['name']) && !empty($praticien['name'])) {
-                            echo htmlspecialchars($praticien['name'] . ' ' . $praticien['surname']);
+                            echo $praticien['name'] . ' ' . $praticien['surname'];
                         } else {
                             echo "A définir";
                         }
                     ?>
                 </p>
             </div>
-            <div class="flex">
-                <span class="material-symbols-outlined">draw</span>
-                <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['type']) ?></p>
-            </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">timer</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?php
@@ -38,11 +38,11 @@ function atelier_card_client($atelier) {
                     ?>
                 </p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">groups_2</span>
                 <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
             </div>
-            <div class="flex">
+            <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">notes</span>
                 <p class="mt-auto mb-auto ml-1">
                     <?= atelier_client_note($atelier['client_id']) ?>

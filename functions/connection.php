@@ -1,6 +1,7 @@
 <?php
 require_once 'generation.php';
 require_once 'db.php';
+require_once 'mail.php';
 
 function login($username, $password, $type) {
     global $sql, $base_url;
@@ -148,6 +149,14 @@ function register($post, $files) {
                     $insertJustif->bindParam(':pratique', $nameDiploma);
                     $insertJustif->bindParam(':justificatif', $justificatif_blob, PDO::PARAM_LOB);
                     $insertJustif->execute();
+
+                    $html = '
+                    <h1>Bonjour ' . htmlspecialchars($surname, ENT_QUOTES, 'UTF-8') . ' ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ',</h1>
+                    <p>Nous vous informons que votre inscription en tant que praticien de Quotidio a bien été prise en compte.</p>
+                    <p>Nous vous donnerons un retour concernant votre inscription dans les plus brefs délais.</p>
+                    ';
+                    send_mail($email, htmlspecialchars("Votre inscription a bien été prise en compte !"), $html, strip_tags($html));            
+               
                 } else {
                     $msg = "Fichier justificatif manquant/mal uploadé pour : " . $nameDiploma;
                     error_log("[register] $msg");
@@ -263,6 +272,15 @@ function create_client_user($id) {
             "id" => $client_id
         ]);
 
+        $html = '
+        <h1>Bonjour ' . htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8') . ',</h1>
+        <p>Nous vous informons que votre compte partenaire a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
+        <p>Identifiant : ' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</p>
+        <p>Mot de passe : ' . htmlspecialchars($password, ENT_QUOTES, 'UTF-8') . '</p>
+        <p>Pour vous connecter à votre compte, rendez-vous sur <a href="https://quotidio.fr/connection/partenaire">https://quotidio.fr/connection/partenaire</a>.</p>
+        ';
+        send_mail($email, htmlspecialchars("Votre compte partenaire a été créé !"), $html, strip_tags($html));
+   
         return $password;
     } catch (Exception $e) {
         error_log("[create_client_user] Exception: " . $e->getMessage());
@@ -397,9 +415,10 @@ function set_praticien_state($id, $state) {
 
 function set_praticien_to_valide($id) {
     global $sql;
-    set_praticien_state($id, "validate");
-    $praticien = get_praticien($id);
     try {
+        set_praticien_state($id, "validate");
+        $praticien = get_praticien($id);
+
         $password = generateToken(12);
         $request = $sql->prepare("INSERT INTO `users` (identifiant, password, token, type, user_id) VALUES (:identifiant, :password, :token, 'praticien', :user_id) ");
         $request->execute([
@@ -409,17 +428,27 @@ function set_praticien_to_valide($id) {
             "user_id" => $praticien["id"]
         ]);
         $user_id = $sql->lastInsertId();
-    } catch (PDOException $e) {
-        $user_id = null;
-    }
-    
-    $request1 = $sql->prepare("UPDATE `praticien` SET user_id=:user_id WHERE id=:id");
-    $request1->execute([
-        "user_id" => $user_id,
-        "id" => $id
-    ]);
 
-    return $password;
+        $request1 = $sql->prepare("UPDATE `praticien` SET user_id=:user_id WHERE id=:id");
+        $request1->execute([
+            "user_id" => $user_id,
+            "id" => $id
+        ]);
+
+        $html = '
+        <h1>Bonjour ' . htmlspecialchars($praticien["surname"], ENT_QUOTES, 'UTF-8') . ' ' . htmlspecialchars($praticien["name"], ENT_QUOTES, 'UTF-8') . ',</h1>
+        <p>Nous vous informons que votre compte praticien a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
+        <p>Identifiant : ' . htmlspecialchars($praticien["email"], ENT_QUOTES, 'UTF-8') . '</p>
+        <p>Mot de passe : ' . htmlspecialchars($password, ENT_QUOTES, 'UTF-8') . '</p>
+        <p>Pour vous connecter à votre compte, rendez-vous sur <a href="https://quotidio.fr/connection/praticien">https://quotidio.fr/connection/praticien</a>.</p>
+        ';
+        send_mail($praticien["email"], htmlspecialchars("Votre compte praticien a été créé !"), $html, strip_tags($html));   
+
+        return $password;
+    } catch (Exception $e) {
+        error_log("[set_praticien_to_valide] Exception: " . $e->getMessage());
+        return false;
+    }
 }
 
 function refuse_del_praticien($id) {

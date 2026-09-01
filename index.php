@@ -1,69 +1,85 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 # ENV
-require_once __DIR__ . '/vendor/autoload.php'; 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/"); 
-$dotenv->load();
+require_once __DIR__ . '/vendor/autoload.php';
+
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/");
+    $dotenv->load();
+} catch (Exception $e) {
+    error_log("Erreur lors du chargement de .env : " . $e->getMessage());
+    http_response_code(500);
+    exit("Erreur de configuration du serveur.");
+}
 
 session_start();
-$isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+$isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
 
-// Base URL (ex: "/yanis" sans slash final)
 $base_url = "";
+
+// Mail Config
 
 // Default values
 $layout = './layout/default.php';
 $maintenance = false;
 
-$url = !isset($_GET['url']) ? 'index' : $_GET['url'];
-if (isset($_GET['link'])) {
-    $link = $_GET['link'];
-}
-$url = trim($url);
+$url = isset($_GET['url']) ? trim($_GET['url']) : 'index';
+$link = isset($_GET['link']) ? $_GET['link'] : null;
 $BASE = $url;
 
-if (isset($url) && preg_match('#^https?://#', $url)) { 
-        $url = "$url";
+if (preg_match('#^https?://#', $url)) { 
+    $requestedUrl = $url;
 } else {
-    $url = "$url.php";
+    $requestedUrl = preg_match('/\.php$/', $url) ? $url : "$url.php";
 }
-if ($BASE == "" || $BASE == "index" || $BASE == "index.html" || $BASE == "index.php" || $BASE == "") {
-    $url = "index.php";
+if ($BASE === "" || $BASE === "index" || $BASE === "index.html" || $BASE === "index.php") {
+    $requestedUrl = "index.php";
 }
 
 // Maintenance mode
 if ($maintenance) {
-    $url = "error/503.php";
+    $requestedUrl = "error/503.php";
 }
 
 // Page conf
 $page_conf = [];
 
-if (file_exists("page/$url") && (!isset($link) || !preg_match('#^https?://#', $link))) {
+$pageFile = "page/$requestedUrl";
+if (file_exists($pageFile) && (!isset($link) || !preg_match('#^https?://#', $link))) {
     ob_start();
-    include "page/$url";
+    include $pageFile;
     $page_content = ob_get_clean();
 
-    if (!empty($page_conf)) {
-        $layout = $page_conf["mg_layout"] ?? $layout;
+    if (!empty($page_conf) && isset($page_conf["mg_layout"])) {
+        $layout = $page_conf["mg_layout"];
     }
 }
-    
-// If Page exist
-if (file_exists("page/$url")) {
+
+// Render logic
+if (file_exists($pageFile)) {
     if ($isAjax) {
-        require "page/$url";
+        require $pageFile;
     } else {
-        if($layout != false){
+        if ($layout !== false && file_exists($layout)) {
             include $layout;
         } else {
-            require "page/$url";
+            require $pageFile;
         }
     }
 } else {
     if ($isAjax) {
+        http_response_code(404);
         echo "Page non trouvée";
     } else {
-        include $layout;
+        if (file_exists($layout)) {
+            include $layout;
+        } else {
+            http_response_code(500);
+            echo "Erreur interne du serveur.";
+        }
     }
 }

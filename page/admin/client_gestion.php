@@ -66,10 +66,17 @@ $TITLE = "Quotidio Planning - Admin";
                 <?php
                 if(isset($_GET["error"])){
                     if ($_GET["error"] == "success"){
+                    if ($_GET["password"] != "error:internal" || $_GET["password"] != "error:user_creation_failed" || $_GET["password"] != "error:invalid_email"){
                     ?>
                     <p class="text-green-900">Création du partenaire avec succès !</p>
                     <p class="text-green-900">Mot de passe du partenaire: <?= $_GET["password"] ?></p>
-                    <?php                    
+                    <?php      
+                    } else {
+                        ?>
+                        <p class="text-red-500">Erros lors de la création du compte partenaire !</p>
+                        <p class="text-red-500">Type d'erreur: <?= $_GET["password"] ?></p>
+                        <?php
+                    }          
                     }
                     else {
                     ?>
@@ -84,7 +91,7 @@ $TITLE = "Quotidio Planning - Admin";
                 if (!empty($clients)) {
                     foreach($clients as $client) {
                         ?>
-                        <a href="/page/admin/user_gestion.php?type=client&user_id=<?php echo $client['id'] ?>">
+                        <a href="/page/admin/user_gestion?type=client&user_id=<?php echo $client['id'] ?>">
                             <div class="partenaire_card">
                                 <div>
                                     <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">

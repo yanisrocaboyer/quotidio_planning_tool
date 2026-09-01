@@ -37,18 +37,18 @@ $TITLE = "Quotidio Planning - Partenaire";
                 <?php
                 $ateliers_futur = get_ateliers("futur", "client", $client_user['id']);
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_futur as $atelier): ?>
-                        <?php echo atelier_card_client($atelier); ?>
+                        <?php echo atelier_card_client($atelier, "futur"); ?>
                     <?php endforeach; ?>
                 </div>
                 <h2 class="mt-2" id="pass">Ateliers passés</h2>
                 <?php
                 $ateliers_pass = get_ateliers("pass", "client", $client_user['id']);
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_pass as $atelier): ?>
-                        <?php echo atelier_card_client($atelier); ?>
+                        <?php echo atelier_card_client($atelier, "pass"); ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -58,23 +58,3 @@ $TITLE = "Quotidio Planning - Partenaire";
 <?php
 }
 ?>
-
-<script>
-const popupAtelier = document.getElementById("createAtelierPopup");
-const createAtelierBtn = document.getElementById("createAtelierBtn");
-const popupFrame = document.querySelector(".popup-frame");
-const cancelBtn = document.getElementById("cancelBtn");
-
-createAtelierBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "";
-});
-popupAtelier.addEventListener("click", () => {
-    popupAtelier.style.display = "none";
-});
-cancelBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "none";
-});
-popupFrame.addEventListener("click", (event) => {
-    event.stopPropagation();
-});
-</script>

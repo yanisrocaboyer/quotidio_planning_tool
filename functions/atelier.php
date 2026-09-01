@@ -11,7 +11,7 @@ function add_atelier($post) {
             empty($post["hourInput"]) ||
             empty($post["clientInput"]) ||
             empty($post["timeInput"]) ||
-            empty($post["maxPersonInput"])
+            empty($post["maxPersonInput"]) 
         ) {
             return "error:missing_data";
         }
@@ -21,11 +21,18 @@ function add_atelier($post) {
         $hour_part = htmlspecialchars(trim($post["hourInput"]), ENT_QUOTES, "UTF-8");
         $time_part = htmlspecialchars(trim($post["timeInput"]), ENT_QUOTES, "UTF-8");
         $client_id = intval($post["clientInput"]);
+        $candidable = intval($post["candidableInput"]);
         $max_participants = !empty($post["maxPersonInput"]) ? intval($post["maxPersonInput"]) : null;
 
         $date_hours_str = $date_part . " " . $hour_part . ":00";
         $date_hours = (new DateTime($date_hours_str))->format('Y-m-d H:i:s');
         $created_at = (new DateTime())->format('Y-m-d H:i:s');
+
+        if ($candidable == 0) {
+            $state = "creation";
+        } else {
+            $state = "pending";
+        }
 
         $sql_str = "INSERT INTO atelier (type, date_hours, state, max_participants, client_id, created_at, duration) 
             VALUES (:type, :date_hours, :state, :max_participants, :client_id, :created_at, :time)";
@@ -33,7 +40,6 @@ function add_atelier($post) {
 
         $insert->bindParam(':type', $type);
         $insert->bindParam(':date_hours', $date_hours);
-        $state = "creation";
         $insert->bindParam(':state', $state);
         $insert->bindParam(':max_participants', $max_participants);
         $insert->bindParam(':client_id', $client_id);
@@ -55,44 +61,70 @@ function add_atelier($post) {
 function edit_atelier($id, $post) {
     global $sql;
     try {
-        if (
-            empty($post["typeInput"]) ||
-            empty($post["dateInput"]) ||
-            empty($post["hourInput"]) ||
-            empty($post["maxPartInput"])
-        ) {
-            return "error:missing_data";
+        $req = $sql->prepare("SELECT state FROM atelier WHERE id = :id");
+        $req->execute(['id' => $id]);
+        $atelier = $req->fetch(PDO::FETCH_ASSOC);
+
+        if (!$atelier) {
+            return "error:not_found";
         }
 
-        $type = htmlspecialchars(trim($post["typeInput"]), ENT_QUOTES, "UTF-8");
-        $date_part = htmlspecialchars(trim($post["dateInput"]), ENT_QUOTES, "UTF-8");
-        $hour_part = htmlspecialchars(trim($post["hourInput"]), ENT_QUOTES, "UTF-8");
+        $state = $atelier['state'];
 
+        $date_part = isset($post["dateInput"]) ? htmlspecialchars(trim($post["dateInput"]), ENT_QUOTES, "UTF-8") : "";
+        $hour_part = isset($post["hourInput"]) ? htmlspecialchars(trim($post["hourInput"]), ENT_QUOTES, "UTF-8") : "";
         $date_hours_str = $date_part . " " . $hour_part . ":00";
         $date_hours = (new DateTime($date_hours_str))->format('Y-m-d H:i:s');
-        $max_participants = !empty($post["maxPartInput"]) ? intval($post["maxPartInput"]) : null;
+        $participants = (isset($post["partInput"]) && $post["partInput"] !== "") ? intval($post["partInput"]) : 0;
 
-        $client_id = (isset($post["clientInput"]) && $post["clientInput"] !== "") ? intval($post["clientInput"]) : null;
-        $praticien_id = (isset($post["praticienInput"]) && $post["praticienInput"] !== "") ? intval($post["praticienInput"]) : null;
-        $participants = (isset($post["partInput"]) && $post["partInput"] !== "") ? intval($post["partInput"]) : null;
+        if ($state === "validate") {
+            if (
+                empty($post["dateInput"]) ||
+                empty($post["hourInput"])
+            ) {
+                return "error:missing_data";
+            }
 
-        $sql_str = "UPDATE atelier SET 
-                        type = :type, 
-                        date_hours = :date_hours,
-                        max_participants = :max_participants,
-                        client_id = :client_id,
-                        praticien_id = :praticien_id,
-                        participants = :participants
-                    WHERE id = :id";
-        $update = $sql->prepare($sql_str);
+            $sql_str = "UPDATE atelier SET 
+                            date_hours = :date_hours,
+                            participants = :participants
+                        WHERE id = :id";
+            $update = $sql->prepare($sql_str);
+            $update->bindParam(':date_hours', $date_hours);
+            $update->bindParam(':participants', $participants);
+            $update->bindParam(':id', $id);
+        } else {
+            if (
+                empty($post["typeInput"]) ||
+                empty($post["dateInput"]) ||
+                empty($post["hourInput"]) ||
+                empty($post["maxPartInput"])
+            ) {
+                return "error:missing_data";
+            }
+            $type = htmlspecialchars(trim($post["typeInput"]), ENT_QUOTES, "UTF-8");
+            $max_participants = !empty($post["maxPartInput"]) ? intval($post["maxPartInput"]) : null;
+            $client_id = (isset($post["clientInput"]) && $post["clientInput"] !== "") ? intval($post["clientInput"]) : null;
+            $praticien_id = (isset($post["praticienInput"]) && $post["praticienInput"] !== "") ? intval($post["praticienInput"]) : null;
 
-        $update->bindParam(':type', $type);
-        $update->bindParam(':date_hours', $date_hours);
-        $update->bindParam(':max_participants', $max_participants);
-        $update->bindParam(':client_id', $client_id);
-        $update->bindParam(':praticien_id', $praticien_id);
-        $update->bindParam(':participants', $participants);
-        $update->bindParam(':id', $id);
+            $sql_str = "UPDATE atelier SET 
+                            type = :type, 
+                            date_hours = :date_hours,
+                            max_participants = :max_participants,
+                            client_id = :client_id,
+                            praticien_id = :praticien_id,
+                            participants = :participants
+                        WHERE id = :id";
+            $update = $sql->prepare($sql_str);
+
+            $update->bindParam(':type', $type);
+            $update->bindParam(':date_hours', $date_hours);
+            $update->bindParam(':max_participants', $max_participants);
+            $update->bindParam(':client_id', $client_id);
+            $update->bindParam(':praticien_id', $praticien_id);
+            $update->bindParam(':participants', $participants);
+            $update->bindParam(':id', $id);
+        }
 
         $result = $update->execute();
 
@@ -123,51 +155,51 @@ function get_ateliers($type, $user="admin", $id=NULL) {
     if ($user == "admin") {
         if ($type == "pending") { 
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE state IN ('pending', 'creation')");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE state IN ('pending', 'creation') ORDER BY date_hours");
             $request->execute();
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
         elseif ($type == "futur") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate'");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate' ORDER BY date_hours");
             $request->execute();
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
         elseif ($type == "pass") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate'");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate' ORDER BY date_hours");
             $request->execute();
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
     } elseif ($user == "praticien") {
         if ($type == "pending") { 
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE state = 'pending'");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE state = 'pending' ORDER BY date_hours");
             $request->execute();
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
         if ($type == "futur") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate' AND praticien_id=:id");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate' AND praticien_id=:id ORDER BY date_hours");
             $request->execute(["id" => $id]);
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
         elseif ($type == "pass") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate' AND praticien_id=:id");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate' AND praticien_id=:id ORDER BY date_hours");
             $request->execute(["id" => $id]);
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
     } elseif ($user == "client") {
         if ($type == "futur") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate' AND client_id=:id");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours > NOW() AND state = 'validate' AND client_id=:id ORDER BY date_hours");
             $request->execute(["id" => $id]);
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
         elseif ($type == "pass") {
             global $sql;
-            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate' AND client_id=:id");
+            $request = $sql->prepare("SELECT * FROM atelier WHERE date_hours < NOW() AND state = 'validate' AND client_id=:id ORDER BY date_hours");
             $request->execute(["id" => $id]);
             return $request->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -181,11 +213,29 @@ function get_atelier_types() {
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function add_atelier_type($name) {
+    global $sql;
+    $request = $sql->prepare("INSERT INTO atelier_type (name) VALUES (:name)");
+    $request->execute(["name" => $name]);
+}
+
+function delete_atelier_type($name) {
+    global $sql;
+    $request = $sql->prepare("DELETE FROM atelier_type WHERE name = :name");
+    $request->execute(["name" => $name]);
+}
+
 function get_atelier($id) {
     global $sql;
     $request = $sql->prepare("SELECT * FROM atelier WHERE id = :id");
     $request->execute(["id" => $id]);
     return $request->fetch(PDO::FETCH_ASSOC);
+}
+
+function set_all_creation_atelier_to_pending() {
+    global $sql;
+    $request = $sql->prepare("UPDATE atelier SET state='pending' WHERE state='creation'");
+    $request->execute();
 }
 
 # Atelier participations 
@@ -197,10 +247,21 @@ function get_participations_atelier($atelier_id) {
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_participations_praticien($praticien_id, $limit="100") {
+function get_count_participations_atelier($atelier_id) {
     global $sql;
-    $request = $sql->prepare("SELECT * FROM participation_atelier WHERE praticien_id = :praticien_id LIMIT $limit");
-    $request->execute(["praticien_id" => $praticien_id]);
+    $request = $sql->prepare("SELECT COUNT(*) as count FROM participation_atelier WHERE atelier_id = :atelier_id");
+    $request->execute(["atelier_id" => $atelier_id]);
+    $result = $request->fetch(PDO::FETCH_ASSOC);
+    return isset($result['count']) ? (int)$result['count'] : 0;
+}
+
+function get_participations_praticien($praticien_id, $limit = 100, $state="pending") {
+    global $sql;
+    $request = $sql->prepare("SELECT * FROM participation_atelier WHERE praticien_id = :praticien_id AND state = :state LIMIT :limit");
+    $request->bindValue(":praticien_id", $praticien_id);
+    $request->bindValue(":limit", (int) $limit, PDO::PARAM_INT);
+    $request->bindValue(":state", $state);
+    $request->execute();
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 

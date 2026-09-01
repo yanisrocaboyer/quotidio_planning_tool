@@ -7,30 +7,56 @@ $user = verif_token($_SESSION["token"]);
 $access = $user["type"];
 if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $access != "praticien") {
     include "./page/error/403.php";
-}
-else {
+} else {
 
 $praticien_user = get_praticien($user['user_id']);
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $result = add_atelier($_POST);
+$TITLE = "Quotidio Planning - Praticien";
 
-    if ($result === "success") {
-        header("Location: ?error=success");
-        exit;
-    } else {
-        header("Location: .?error=". $result);
+if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
+    $atelier_id = $_GET['atelier_id'];
+    if ($_GET['act'] === 'candidateAtelier') {
+        $participation_exist = get_participations_ap($atelier_id, $praticien_user["id"]);
+        $atelier = get_atelier($atelier_id);
+        if ($atelier && $atelier['state'] === "pending" && empty($participation_exist)) {
+            add_participation_atelier($atelier_id, $praticien_user['id']);
+            header("Location: ?msg=candidateAccept#candidatures");
+            exit;
+        } else {
+            header("Location: ?msg=errorCandidateAccept#candidatures");
+            exit;
+        }
+    } else if ($_GET['act'] === 'delCandidateAtelier') {
+        $participation_exist = get_participations_ap($atelier_id, $praticien_user["id"]);
+        $atelier = get_atelier($atelier_id);
+        if ($atelier && $atelier['state'] === "pending" && !empty($participation_exist)) {
+            delete_participation_atelier($atelier_id, $praticien_user['id']);
+            header("Location: ?msg=candidatureDeleted#candidatures");
+            exit;
+        } else {
+            header("Location: ?msg=errorCandidateAccept#candidatures");
+            exit;
+        }
     }
 }
-
-atelier_action_candidature($praticien_user['id']);
-atelier_action_delCandidature($praticien_user['id']);
-
-$TITLE = "Quotidio Planning - Praticien";
 ?>
 <div class="dashboard">
     <div class="dashboard-content">
         <?php include 'components/praticien/sidebar.php' ?> 
+        <div style="display:none" class="popup" id="candidatureAtelierPopup">
+            <div class="popup-frame">
+                <div class="popup-content">
+                    <h1 class="text-center" id="candidaturePopupTitle" style="margin-top:10px;"></h1>
+                    <div class="mt-4 text-center">
+                        <p id="candidaturePopupMsg"></p>
+                    </div>
+                    <div class="mt-6 flex justify-center gap-4" style="margin-top:2rem;gap:1rem;">
+                        <button type="button" class="btn-primary" id="candidatureBtnOui">Oui</button>
+                        <button type="button" class="btn-primary" id="candidatureBtnNon">Non</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="content">
             <div class="ml-5 mt-5">
                 <div class="flex">
@@ -40,7 +66,7 @@ $TITLE = "Quotidio Planning - Praticien";
                 <?php
                 $ateliers_futur = get_ateliers("futur", "praticien", $praticien_user['id']);
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 ">
                     <?php foreach ($ateliers_futur as $atelier): ?>
                         <?php echo atelier_card_praticien($atelier, 'futur'); ?>
                     <?php endforeach; ?>
@@ -49,7 +75,7 @@ $TITLE = "Quotidio Planning - Praticien";
                 <?php
                 $ateliers_pass = get_ateliers("pass", "praticien", $praticien_user['id']);
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2">
                     <?php foreach ($ateliers_pass as $atelier): ?>
                         <?php echo atelier_card_praticien($atelier, 'pass'); ?>
                     <?php endforeach; ?>
@@ -58,23 +84,60 @@ $TITLE = "Quotidio Planning - Praticien";
                 <?php
                 if (isset($_GET["msg"])) {
                     if ($_GET["msg"] == "candidateAccept") {
-                        echo "<p class='text-green-600'>Votre candidature a été enregistrer avec succès !</p>";
+                        echo "<p class='text-green-600'>Votre candidature a été enregistré avec succès !</p>";
                     } else if ($_GET["msg"] == "candidatureDeleted") {
-                        echo "<p class='text-green-600'>Votre candidature a été supprimer avec succès !</p>";
+                        echo "<p class='text-green-600'>Votre candidature a été supprimée avec succès !</p>";
                     } else if ($_GET["msg"] == "errorCandidateAccept") {
-                        echo "<p class='text-red-500'>Oups.. Une erreur est survenue lors de l'enrengistrement de votre candidature.</p>";
+                        echo "<p class='text-red-500'>Oups.. Une erreur est survenue lors de l'enregistrement de votre candidature.</p>";
                     }
                 }
 
                 $participations = get_participations_praticien($praticien_user["id"], 4);
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php if (empty($participations)): ?>
                         <p style="grid-column: 1 / -1;">Aucune</p>
                     <?php else: ?>
-                        <?php foreach ($participations as $partcipation): 
-                        $atelier = get_atelier($partcipation['atelier_id']);?>
-                        <?php echo atelier_card_praticien($atelier, 'candidature'); ?>
+                        <?php foreach ($participations as $participation): 
+                        $atelier = get_atelier($participation['atelier_id']);?>
+                        <div class="atelier clickable-candidature" 
+                            data-atelier-id="<?= $atelier['id'] ?>" 
+                            data-action="delCandidateAtelier" 
+                            data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
+                            <div class="ml-2 mt-1 mb-1">
+                                <h2><?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?></h2>
+                                <div class="flex">
+                                    <span class="material-symbols-outlined">location_on</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?php
+                                            $client = get_client($atelier['client_id']);
+                                            echo isset($client['adress']) ? $client['adress'] : "A définir";
+                                        ?>
+                                    </p>
+                                </div>
+                                <div class="flex">
+                                    <span class="material-symbols-outlined">draw</span>
+                                    <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?= isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue"; ?>
+                                    </p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">groups_2</span>
+                                    <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">notes</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?= atelier_client_note($atelier['client_id']) ?>
+                                    </p>
+                                </div>
+                                <button class="w-full text-center border rounded-4xl mt-2 border-black p-1">Supprimer ma candidature</button>
+                            </div>
+                        </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
@@ -82,7 +145,7 @@ $TITLE = "Quotidio Planning - Praticien";
                 <?php
                 $ateliers_disponibles = get_ateliers("pending", "praticien");
                 ?>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4">
                     <?php
                     $found = false;
                     if (!empty($ateliers_disponibles)):
@@ -93,7 +156,44 @@ $TITLE = "Quotidio Planning - Praticien";
                             }
                             $found = true;
                     ?>
-                        <?php echo atelier_card_praticien($atelier, 'disponible'); ?>
+                        <div class="atelier cursor-pointer clickable-candidature"
+                            data-atelier-id="<?= $atelier['id'] ?>"
+                            data-action="candidateAtelier"
+                            data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
+                            <div class="ml-2 mt-1 mb-1">
+                                <h2><?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?></h2>
+                                <div class="flex">
+                                    <span class="material-symbols-outlined">location_on</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?php
+                                            $client = get_client($atelier['client_id']);
+                                            echo isset($client['adress']) ? $client['adress'] : "A définir";
+                                        ?>
+                                    </p>
+                                </div>
+                                <div class="flex">
+                                    <span class="material-symbols-outlined">draw</span>
+                                    <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?= isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue"; ?>
+                                    </p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">groups_2</span>
+                                    <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
+                                </div>
+                                <div class="flex atelier-hidden">
+                                    <span class="material-symbols-outlined">notes</span>
+                                    <p class="mt-auto mb-auto ml-1">
+                                        <?= atelier_client_note($atelier['client_id']) ?>
+                                    </p>
+                                </div>
+                                <button class="w-full text-center border rounded-4xl mt-2 border-black p-1">Participer à l'atelier</button>
+                            </div>
+                        </div>
                     <?php
                         endforeach;
                     endif;
@@ -103,8 +203,6 @@ $TITLE = "Quotidio Planning - Praticien";
                         <p style="grid-column: 1 / -1;">Aucun (ou aucun dont vous n'avez pas candidaté)</p>
                     <?php endif; ?>
                 </div>
-        
-           
             </div>
         </div>
     </div>
@@ -114,21 +212,56 @@ $TITLE = "Quotidio Planning - Praticien";
 ?>
 
 <script>
-const popupAtelier = document.getElementById("createAtelierPopup");
-const createAtelierBtn = document.getElementById("createAtelierBtn");
-const popupFrame = document.querySelector(".popup-frame");
-const cancelBtn = document.getElementById("cancelBtn");
+document.addEventListener("DOMContentLoaded", function() {
+    const popup = document.getElementById("candidatureAtelierPopup");
+    const popupFrame = popup.querySelector(".popup-frame");
+    const closeBtn = document.getElementById("closeCandidaturePopup");
+    const btnOui = document.getElementById("candidatureBtnOui");
+    const btnNon = document.getElementById("candidatureBtnNon");
+    let actionUrl = "#";
 
-createAtelierBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "";
-});
-popupAtelier.addEventListener("click", () => {
-    popupAtelier.style.display = "none";
-});
-cancelBtn.addEventListener("click", () => {
-    popupAtelier.style.display = "none";
-});
-popupFrame.addEventListener("click", (event) => {
-    event.stopPropagation();
+    document.querySelectorAll('.clickable-candidature').forEach(function(card){
+        card.addEventListener('click', function(e){
+            e.preventDefault();
+            const atelierId = card.dataset.atelierId;
+            const action = card.dataset.action; 
+            const atelierDate = card.dataset.atelierDate;
+            let msg = "";
+            let titre = "";
+
+            if (action === "candidateAtelier") {
+                titre = "Candidater à l'atelier ?";
+                msg = "Voulez-vous participer à l'atelier du <b>"+atelierDate+"</b> ?";
+            } else if (action === "delCandidateAtelier") {
+                titre = "Annuler candidature";
+                msg = "Voulez-vous <b>supprimer</b> votre candidature pour l'atelier du <b>"+atelierDate+"</b> ?";
+            }
+
+            document.getElementById("candidaturePopupTitle").innerText = titre;
+            document.getElementById("candidaturePopupMsg").innerHTML = msg;
+
+            actionUrl = "?act=" + encodeURIComponent(action) + "&atelier_id=" + encodeURIComponent(atelierId);
+
+            popup.style.display = "";
+        });
+    });
+
+    btnOui.addEventListener('click', function(){
+        window.location.href = actionUrl;
+    });
+
+    // Fermer popup: Non, Croix ou cliquer dehors
+    btnNon.addEventListener('click', function(){
+        popup.style.display = "none";
+    });
+    closeBtn.addEventListener('click', function(){
+        popup.style.display = "none";
+    });
+    popup.addEventListener('click', function(){
+        popup.style.display = "none";
+    });
+    popupFrame.addEventListener('click', function(event){
+        event.stopPropagation();
+    });
 });
 </script>

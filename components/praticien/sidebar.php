@@ -13,7 +13,7 @@
         <p>Ateliers</p>
         <hr class="text-gray-300">
         <div>
-            <a href="/praticien/index#future" class="flex items-center mt-2 text-primary hover:text-secondary">
+            <a href="/praticien/index#futur" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">event_upcoming</span>
                 <p class="ml-1">Ateliers à venir</p>
             </a>
@@ -40,7 +40,7 @@
                 </a>
             </div>
             <div>
-                <a href="../logout.php" class="flex items-center mt-1 logout">
+                <a href="../logout" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="ml-1">Déconnexion</p>
                 </a>

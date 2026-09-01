@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <?php
                         if ($praticien["state"] == "pending") {
                         ?>
-                            <a href="?action=valide&type=praticien&user_id=<?= $praticien["id"] ?>">Passer le statut d'adhésion en accepté</a><br>
+                            <a href="?action=valide&type=praticien&user_id=<?= $praticien["id"] ?>">Passer le statut d'adhésion a accepté</a><br>
                             <?php
                             if (isset($_GET['action']) && $_GET['action'] === 'valide' && isset($_GET['user_id']) && $_GET['user_id'] == $praticien["id"]) {
                                 require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
@@ -155,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             }
                             ?>
                        
-                            <a href="?action=refuse&type=praticien&user_id=<?= $praticien["id"] ?>" class="warn">Passer le statut d'adhésion en refusé (garder en BDD)</a><br>
+                            <a href="?action=refuse&type=praticien&user_id=<?= $praticien["id"] ?>" class="warn">Passer le statut d'adhésion a refusé (garder en BDD)</a><br>
                             <?php
                             if (isset($_GET['action']) && $_GET['action'] === 'refuse' && isset($_GET['user_id']) && $_GET['user_id'] == $praticien["id"]) {
                                 require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
@@ -184,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
                                 delete_praticien($praticien["id"]);
                                 echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $praticien["id"] . ");</script>";
-                                header("Location: praticien_gestion.php?msg=accountDeleted");
+                                header("Location: praticien_gestion?msg=accountDeleted");
                             }
                         ?>
                     </div>
@@ -214,7 +214,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <form method="POST">
                             <div class="mt-3">
                                 <label for="nameInput">Nom :</label>
-                                <input type="text" id="nameInput" name="nameInput" value="<?php echo htmlspecialchars($client['name']) ?>" required>
+                                <input type="text" id="nameInput" name="nameInput" value="<?php echo $client['name'] ?>" required>
                             </div>
                             <div class="mt-3">
                                 <label for="emailInput">Adresse e-mail :</label>
@@ -226,11 +226,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <div class="mt-3">
                                 <label for="adressInput">Adresse :</label>
-                                <input type="text" id="adressInput" name="adressInput" value="<?php echo htmlspecialchars($client['adress']) ?>" required>
+                                <input type="text" id="adressInput" name="adressInput" class="w-100" value="<?php echo $client['adress'] ?>" required>
                             </div>
                             <div class="mt-3">
                                 <label for="adressInput">Commentaire :</label>
-                                <input type="text" id="noteInput" name="noteInput" value="<?php echo $client['note'] ?>">
+                                <input type="text" id="noteInput" name="noteInput" class="w-100" value="<?php echo $client['note'] ?>">
                             </div>
                             <button class="mt-2 underline" type="submit">Modifier les informations</button>
                         </form>
@@ -257,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     require_once($_SERVER['DOCUMENT_ROOT'] . '/functions/connection.php');
                                     $result = delete_client($user_id);
                                     echo "<script>window.location.href = window.location.pathname + '?id=' + encodeURIComponent(" . $client["id"] . ");</script>";
-                                    header("Location: client_gestion.php?msg={$result}");
+                                    header("Location: client_gestion?msg={$result}");
                                 }
                         }}
                         ?>

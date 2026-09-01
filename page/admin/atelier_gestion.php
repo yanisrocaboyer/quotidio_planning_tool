@@ -75,14 +75,12 @@ if ($atelier) {
                             echo "<p class='text-red-500'>Error lors de l'édition de l'atelier: {$_GET['msg']} </p>";
                         } else if (isset($_GET["error"]) && $_GET["error"] == "atelierUpdateSuccess") {
                             echo "<p class='text-green-600'>Mise à jour de l'atelier réussis !</p>";
-                        } else if (isset($_GET["infoMsg"])) {
-                            echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
                         }
                         ?>
                         <h3 ><b>Informations :</b></h3>
                         <div>
                             <label for="typeInput">Type:</label>
-                            <input type="text" id="typeInput" name="typeInput" value="<?php echo htmlspecialchars($atelier['type']) ?>" required  <?php if ($atelier['state'] === 'validate') echo 'disabled'; ?>>
+                            <input type="text" id="typeInput" name="typeInput" value="<?php echo $atelier['type'] ?>" required>
                         </div>
                         <?php 
                         $date_hours = $atelier['date_hours'];
@@ -106,11 +104,11 @@ if ($atelier) {
                         </div>
                         <div>
                             <label for="maxPartInput">Participants maximum:</label>
-                            <input type="num" id="maxPartInput" name="maxPartInput" value="<?php echo htmlspecialchars($atelier['max_participants']) ?>" required <?php if ($atelier['state'] === 'validate') echo 'disabled'; ?>>
+                            <input type="num" id="maxPartInput" name="maxPartInput" value="<?php echo htmlspecialchars($atelier['max_participants']) ?>" required>
                         </div>
                         <div>
-                            <label for="partInput">Participants:</label>
-                            <input type="num" id="partInput" name="partInput" value="<?php $atelier['participants'] ?>">
+                            <label for="partInput">Participants réels:</label>
+                            <input type="num" id="partInput" name="partInput" value="<?php echo htmlspecialchars($atelier['participants']) ?>">
                         </div>
                     </div>
                     <div class="mt-2" id="affilations">
@@ -129,7 +127,6 @@ if ($atelier) {
                                         $client_id = htmlspecialchars($client['id']);
                                         $client_name = htmlspecialchars($client['name']);
                                         $selected = ($client_id == $selected_client_id) ? 'selected' : '';
-                                        $disabled = ($atelier['state'] === 'validate') ? 'disabled' : '';
                                         echo "<option value=\"$client_id\" $selected $disabled>$client_name</option>";
                                     }
                                 }
@@ -150,7 +147,6 @@ if ($atelier) {
                                         $praticien_name = htmlspecialchars($praticien['name']);
                                         $selected = ($praticien_id == $selected_praticien_id) ? 'selected' : '';
                                         $selected = ($praticien_id == $selected_praticien_id) ? 'selected' : '';
-                                        $disabled = ($atelier['state'] === 'validate') ? 'disabled' : '';
                                         echo "<option value=\"$praticien_id\" $selected $disabled>$praticien_name $praticien_surname</option>";                                
                                     }
                                 }

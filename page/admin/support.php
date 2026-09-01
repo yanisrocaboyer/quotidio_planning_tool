@@ -19,7 +19,7 @@ $TITLE = "Quotidio Planning - Admin";
                     <h1 class="text-2xl">🛟 Support</h1>
                 </div>
                 <p>Cette page est destiné en cas de problème.</p>
-                <p>En cas de problème, merci de contacter: <a href="mailto:yanis.rocaboyer@mazegroup.org">yanis.rocaboyer@mazegroup.org</a></p>
+                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a></p>
             </div>
         </div>
     </div>

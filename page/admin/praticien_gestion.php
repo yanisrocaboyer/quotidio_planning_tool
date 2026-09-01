@@ -28,7 +28,7 @@ $TITLE = "Quotidio Planning - Admin";
                 $pending_praticiens = get_praticiens("pending");
                 foreach($pending_praticiens as $praticien) {
                     ?>
-                    <a href="/page/admin/user_gestion.php?type=praticien&user_id=<?= $praticien['id'] ?>">
+                    <a href="/page/admin/user_gestion?type=praticien&user_id=<?= $praticien['id'] ?>">
                         <div class="partenaire_card">
                             <div>
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
@@ -50,7 +50,7 @@ $TITLE = "Quotidio Planning - Admin";
                 $valide_praticiens = get_praticiens("validate");
                 foreach($valide_praticiens as $praticien) {
                     ?>
-                    <a href="/page/admin/user_gestion.php?type=praticien&user_id=<?php echo $praticien['id'] ?>">
+                    <a href="/page/admin/user_gestion?type=praticien&user_id=<?php echo $praticien['id'] ?>">
                         <div class="partenaire_card">
                             <div>
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
@@ -72,7 +72,7 @@ $TITLE = "Quotidio Planning - Admin";
                 $refuse_praticien = get_praticiens("refuse");
                 foreach($refuse_praticien as $praticien) {
                     ?>
-                    <a href="/page/admin/user_gestion.php?type=praticien&user_id=<?php echo $praticien['id'] ?>">
+                    <a href="/page/admin/user_gestion?type=praticien&user_id=<?php echo $praticien['id'] ?>">
                         <div class="partenaire_card">
                             <div>
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">

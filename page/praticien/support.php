@@ -30,9 +30,10 @@ $TITLE = "Quotidio Planning - Praticien";
         <div class="content">
             <div class="ml-5 mt-5">
                 <div class="flex">
-                    <h1 class="text-2xl">👋 Bonjour, <?php echo $user["identifiant"] ?></h1>
+                    <h1 class="text-2xl">🛟 Support</h1>
                 </div>
-                <p>Page en construction...</p>
+                <p>Cette page est destiné en cas de problème.</p>
+                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a></p>
             </div>
         </div>
     </div>
