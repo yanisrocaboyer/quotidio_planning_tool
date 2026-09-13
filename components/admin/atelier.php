@@ -4,10 +4,16 @@ require_once __DIR__ . '/../../functions/atelier.php';
 require_once __DIR__ . '/../../functions/connection.php';
 require_once __DIR__ . '/../../functions/info.php';
 
-function atelier_card_admin($atelier, $link = false, $type="pending") {
+function atelier_card_admin($atelier, $type="pending") {
     ob_start();
     ?>
-    <div class="atelier <?= $type ?>" style="position: relative;">
+    <div class="atelier atelier-clickable atelier-filter-item <?= $type ?>"
+        data-filter-section="<?= htmlspecialchars($type) ?>"
+        data-praticien="<?= isset($atelier['praticien_id']) ? htmlspecialchars($atelier['praticien_id']) : '' ?>"
+        data-client="<?= isset($atelier['client_id']) ? htmlspecialchars($atelier['client_id']) : '' ?>"
+        data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($atelier['date_hours']))) ?>"
+        data-type="<?= isset($atelier['type']) ? htmlspecialchars($atelier['type']) : '' ?>"
+        style="position: relative;">
         <?php 
         if($type=="pending" && get_count_participations_atelier($atelier["id"])){
             ?>
@@ -73,15 +79,13 @@ function atelier_card_admin($atelier, $link = false, $type="pending") {
                     <?= atelier_client_note($atelier['client_id']) ?>
                 </p>
             </div>
+            <div class="atelier-actions">
+                <a href="atelier_gestion?id=<?= htmlspecialchars($atelier['id']) ?>" class="w-full block text-center border rounded-4xl mt-2 border-black p-1">Modifier l'atelier</a>
+            </div>
         </div>
     </div>
     <?php
-    $card = ob_get_clean();
-
-    if ($link) {
-        return '<a href="atelier_gestion?id=' . htmlspecialchars($atelier['id']) . '">' . $card . '</a>';
-    }
-    return $card;
+    return ob_get_clean();
 }
 
 function atelier_actions_admin($atelier) {
@@ -104,7 +108,8 @@ function atelier_actions_admin($atelier) {
                 ?>
             </div>
         <?php } ?>
-        <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a>
+        <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a><br>
+        <a href="?action=duplicateAtelier&id=<?php echo $atelier['id'] ?>">Dupliquer l'atelier</a>
     </div>
     <?php
     if (isset($_GET['action']) && isset($_GET['pid']) && isset($_GET['id'])) {
@@ -138,6 +143,14 @@ function atelier_action_state($atelier) {
         case 'deleteAtelier':
             del_atelier($atelier['id']);
             header("Location: index?id={$atelier['id']}&infoMsg=Atelier supprimé");
+            exit;
+        case 'duplicateAtelier':
+            $new_id = duplicate_atelier($atelier['id']);
+            if ($new_id) {
+                header("Location: atelier_gestion?id={$new_id}&infoMsg=Atelier dupliqué avec succès");
+            } else {
+                header("Location: atelier_gestion?id={$atelier['id']}&infoMsg=Erreur lors de la duplication");
+            }
             exit;
         default:
             return;

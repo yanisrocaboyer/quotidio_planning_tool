@@ -62,7 +62,15 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                 <div class="flex">
                     <h1 class="text-2xl">👋 Bonjour, <?php echo $praticien_user["surname"] ?></h1>
                 </div>
-                <h2 class="mt-2" id="futur">Ateliers à venir</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="futur">Ateliers à venir</h2>
+                    <?php
+                    render_atelier_filters('futur', array(
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_futur = get_ateliers("futur", "praticien", $praticien_user['id']);
                 ?>
@@ -71,7 +79,15 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                         <?php echo atelier_card_praticien($atelier, 'futur'); ?>
                     <?php endforeach; ?>
                 </div>
-                <h2 class="mt-2" id="pass">Ateliers passés</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="pass">Ateliers passés</h2>
+                    <?php
+                    render_atelier_filters('pass', array(
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_pass = get_ateliers("pass", "praticien", $praticien_user['id']);
                 ?>
@@ -80,7 +96,15 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                         <?php echo atelier_card_praticien($atelier, 'pass'); ?>
                     <?php endforeach; ?>
                 </div>
-                <h2 class="mt-2" id="candidatures">Mes candidatures</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="candidatures">Mes candidatures</h2>
+                    <?php
+                    render_atelier_filters('candidature', array(
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 if (isset($_GET["msg"])) {
                     if ($_GET["msg"] == "candidateAccept") {
@@ -100,48 +124,19 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                     <?php else: ?>
                         <?php foreach ($participations as $participation): 
                         $atelier = get_atelier($participation['atelier_id']);?>
-                        <div class="atelier clickable-candidature" 
-                            data-atelier-id="<?= $atelier['id'] ?>" 
-                            data-action="delCandidateAtelier" 
-                            data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
-                            <div class="ml-2 mt-1 mb-1">
-                                <h2><?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?></h2>
-                                <div class="flex">
-                                    <span class="material-symbols-outlined">location_on</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?php
-                                            $client = get_client($atelier['client_id']);
-                                            echo isset($client['adress']) ? $client['adress'] : "A définir";
-                                        ?>
-                                    </p>
-                                </div>
-                                <div class="flex">
-                                    <span class="material-symbols-outlined">draw</span>
-                                    <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">timer</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?= isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue"; ?>
-                                    </p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">groups_2</span>
-                                    <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">notes</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?= atelier_client_note($atelier['client_id']) ?>
-                                    </p>
-                                </div>
-                                <button class="w-full text-center border rounded-4xl mt-2 border-black p-1">Supprimer ma candidature</button>
-                            </div>
-                        </div>
+                        <?php echo atelier_card_praticien($atelier, 'candidature'); ?>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-                <h2 class="mt-2">Ateliers disponibles</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2">Ateliers disponibles</h2>
+                    <?php
+                    render_atelier_filters('disponible', array(
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_disponibles = get_ateliers("pending", "praticien");
                 ?>
@@ -155,46 +150,7 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                                 continue; 
                             }
                             $found = true;
-                    ?>
-                        <div class="atelier cursor-pointer clickable-candidature"
-                            data-atelier-id="<?= $atelier['id'] ?>"
-                            data-action="candidateAtelier"
-                            data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
-                            <div class="ml-2 mt-1 mb-1">
-                                <h2><?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?></h2>
-                                <div class="flex">
-                                    <span class="material-symbols-outlined">location_on</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?php
-                                            $client = get_client($atelier['client_id']);
-                                            echo isset($client['adress']) ? $client['adress'] : "A définir";
-                                        ?>
-                                    </p>
-                                </div>
-                                <div class="flex">
-                                    <span class="material-symbols-outlined">draw</span>
-                                    <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">timer</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?= isset($atelier['duration']) ? htmlspecialchars($atelier['duration']) : "Durée inconnue"; ?>
-                                    </p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">groups_2</span>
-                                    <p class="mt-auto mb-auto ml-1"><?= htmlspecialchars($atelier['max_participants']) ?></p>
-                                </div>
-                                <div class="flex atelier-hidden">
-                                    <span class="material-symbols-outlined">notes</span>
-                                    <p class="mt-auto mb-auto ml-1">
-                                        <?= atelier_client_note($atelier['client_id']) ?>
-                                    </p>
-                                </div>
-                                <button class="w-full text-center border rounded-4xl mt-2 border-black p-1">Participer à l'atelier</button>
-                            </div>
-                        </div>
-                    <?php
+                            echo atelier_card_praticien($atelier, 'disponible');
                         endforeach;
                     endif;
 
@@ -220,12 +176,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnNon = document.getElementById("candidatureBtnNon");
     let actionUrl = "#";
 
-    document.querySelectorAll('.clickable-candidature').forEach(function(card){
-        card.addEventListener('click', function(e){
+    document.querySelectorAll('.candidature-trigger').forEach(function(btn){
+        btn.addEventListener('click', function(e){
             e.preventDefault();
-            const atelierId = card.dataset.atelierId;
-            const action = card.dataset.action; 
-            const atelierDate = card.dataset.atelierDate;
+            e.stopPropagation();
+            const atelierId = btn.dataset.atelierId;
+            const action = btn.dataset.action; 
+            const atelierDate = btn.dataset.atelierDate;
             let msg = "";
             let titre = "";
 
@@ -246,17 +203,22 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    btnOui.addEventListener('click', function(){
-        window.location.href = actionUrl;
-    });
+    if (btnOui) {
+        btnOui.addEventListener('click', function(){
+            window.location.href = actionUrl;
+        });
+    }
 
-    // Fermer popup: Non, Croix ou cliquer dehors
-    btnNon.addEventListener('click', function(){
-        popup.style.display = "none";
-    });
-    closeBtn.addEventListener('click', function(){
-        popup.style.display = "none";
-    });
+    if (btnNon) {
+        btnNon.addEventListener('click', function(){
+            popup.style.display = "none";
+        });
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(){
+            popup.style.display = "none";
+        });
+    }
     popup.addEventListener('click', function(){
         popup.style.display = "none";
     });

@@ -33,7 +33,15 @@ $TITLE = "Quotidio Planning - Partenaire";
                 <div class="flex">
                     <h1 class="text-2xl">👋 Bonjour, <?php echo $client_user["name"] ?></h1>
                 </div>
-                <h2 class="mt-2" id="futur">Ateliers à venir</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="futur">Ateliers à venir</h2>
+                    <?php
+                    render_atelier_filters('futur', array(
+                        'praticiens' => get_praticiens("validate"),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_futur = get_ateliers("futur", "client", $client_user['id']);
                 ?>
@@ -42,7 +50,15 @@ $TITLE = "Quotidio Planning - Partenaire";
                         <?php echo atelier_card_client($atelier, "futur"); ?>
                     <?php endforeach; ?>
                 </div>
-                <h2 class="mt-2" id="pass">Ateliers passés</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="pass">Ateliers passés</h2>
+                    <?php
+                    render_atelier_filters('pass', array(
+                        'praticiens' => get_praticiens("validate"),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_pass = get_ateliers("pass", "client", $client_user['id']);
                 ?>

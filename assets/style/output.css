@@ -296,6 +296,9 @@
   .mt-auto {
     margin-top: auto;
   }
+  .mr-2 {
+    margin-right: calc(var(--spacing) * 2);
+  }
   .mr-3 {
     margin-right: calc(var(--spacing) * 3);
   }
@@ -398,9 +401,6 @@
   .animate-ping {
     animation: var(--animate-ping);
   }
-  .cursor-pointer {
-    cursor: pointer;
-  }
   .list-decimal {
     list-style-type: decimal;
   }
@@ -419,6 +419,9 @@
   .flex-row {
     flex-direction: row;
   }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
   .items-center {
     align-items: center;
   }
@@ -427,6 +430,9 @@
   }
   .justify-center {
     justify-content: center;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
   }
   .gap-4 {
     gap: calc(var(--spacing) * 4);
@@ -858,7 +864,7 @@
   --tw-ease: var(--ease-in-out);
   transition-timing-function: var(--ease-in-out);
 }
-.atelier:hover .atelier-hidden {
+.atelier.deployed .atelier-hidden {
   display: flex;
   opacity: 100%;
   transition-property: max-height,opacity;
@@ -868,6 +874,41 @@
   transition-duration: 350ms;
   --tw-ease: var(--ease-in-out);
   transition-timing-function: var(--ease-in-out);
+}
+.atelier .atelier-actions {
+  display: none;
+  overflow: hidden;
+  opacity: 0%;
+  transition-property: max-height,opacity;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  --tw-duration: 350ms;
+  transition-duration: 350ms;
+  --tw-ease: var(--ease-in-out);
+  transition-timing-function: var(--ease-in-out);
+}
+.atelier.deployed .atelier-actions {
+  display: block;
+  opacity: 100%;
+  transition-property: max-height,opacity;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  --tw-duration: 350ms;
+  transition-duration: 350ms;
+  --tw-ease: var(--ease-in-out);
+  transition-timing-function: var(--ease-in-out);
+}
+.atelier-clickable {
+  cursor: pointer;
+}
+.input-filter {
+  border-radius: var(--radius-md);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  border-color: var(--color-secondary);
+  padding: var(--spacing);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
 }
 .popup {
   position: absolute;

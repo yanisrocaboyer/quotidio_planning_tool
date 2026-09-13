@@ -41,3 +41,39 @@ function atelier_client_note($client_id) {
     }
     return $clientNote["note"];
 }
+
+function render_atelier_filters($section, $options = array()) {
+    $praticiens = isset($options['praticiens']) ? $options['praticiens'] : array();
+    $clients = isset($options['clients']) ? $options['clients'] : array();
+    $types = isset($options['types']) ? $options['types'] : array();
+    $section = htmlspecialchars($section, ENT_QUOTES, "UTF-8");
+    ?>
+    <div class="atelier-filters flex flex-wrap gap-2 items-center ml-2">
+        <?php if (!empty($praticiens)): ?>
+            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="praticien" title="Filtrer par praticien">
+                <option value="">Praticien : tous</option>
+                <?php foreach ($praticiens as $p): ?>
+                    <option value="<?= htmlspecialchars($p['id']) ?>"><?= htmlspecialchars($p['name'] . ' ' . $p['surname']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+        <?php if (!empty($clients)): ?>
+            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="client" title="Filtrer par partenaire">
+                <option value="">Partenaire : tous</option>
+                <?php foreach ($clients as $c): ?>
+                    <option value="<?= htmlspecialchars($c['id']) ?>"><?= htmlspecialchars($c['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+        <input type="date" class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="date" title="Filtrer par date">
+        <?php if (!empty($types)): ?>
+            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="type" title="Filtrer par type d'atelier">
+                <option value="">Type : tous</option>
+                <?php foreach ($types as $t): ?>
+                    <option value="<?= htmlspecialchars($t['name']) ?>"><?= htmlspecialchars($t['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
+    </div>
+    <?php
+}

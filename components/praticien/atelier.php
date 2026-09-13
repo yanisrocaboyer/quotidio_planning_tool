@@ -10,22 +10,21 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
 
     ob_start();
     ?>
-    <?php if ($candidatable): ?>
-    <a href="?action=candidateAtelier&atelier_id=<?= $atelier['id'] ?>">
-    <?php endif; 
-    if ($candidate): ?>
-    <a href="?action=delCandidateAtelier&atelier_id=<?= $atelier['id'] ?>">
-    <?php endif; ?>
-    <div class="atelier <?= $variant ?>">
+    <div class="atelier atelier-clickable atelier-filter-item <?= $variant ?>"
+        data-filter-section="<?= htmlspecialchars($variant) ?>"
+        data-praticien="<?= isset($atelier['praticien_id']) ? htmlspecialchars($atelier['praticien_id']) : '' ?>"
+        data-client="<?= isset($atelier['client_id']) ? htmlspecialchars($atelier['client_id']) : '' ?>"
+        data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($atelier['date_hours']))) ?>"
+        data-type="<?= isset($atelier['type']) ? htmlspecialchars($atelier['type']) : '' ?>">
         <div class="ml-2 mt-1 mb-1">
             <h2 class="<?= ($candidatable || $candidate) ? 'flex' : '' ?>">
                 <?php
                     echo format_french_date(new DateTime($atelier['date_hours']));
                     if ($candidatable) {
-                        info("Cliquer sur l'atelier pour y participer");
+                        info("Cliquer sur l'atelier pour voir les détails");
                     }
                     else if ($candidate) {
-                        info("Cliquer sur l'atelier pour supprimer votre candidature");
+                        info("Cliquer sur l'atelier pour voir les détails");
                     }
                 ?>
             </h2>
@@ -80,11 +79,29 @@ function atelier_card_praticien($atelier, $variant = 'futur') {
                     <?= atelier_client_note($atelier['client_id']) ?>
                 </p>
             </div>
+            <?php if ($candidatable): ?>
+            <div class="atelier-actions">
+                <button type="button"
+                    class="w-full text-center border rounded-4xl mt-2 border-black p-1 candidature-trigger"
+                    data-atelier-id="<?= $atelier['id'] ?>"
+                    data-action="candidateAtelier"
+                    data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
+                    Participer à l'atelier
+                </button>
+            </div>
+            <?php elseif ($candidate): ?>
+            <div class="atelier-actions">
+                <button type="button"
+                    class="w-full text-center border rounded-4xl mt-2 border-black p-1 candidature-trigger"
+                    data-atelier-id="<?= $atelier['id'] ?>"
+                    data-action="delCandidateAtelier"
+                    data-atelier-date="<?= htmlspecialchars(format_french_date(new DateTime($atelier['date_hours']))) ?>">
+                    Supprimer ma candidature
+                </button>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
-    <?php if ($candidatable || $candidate): ?>
-    </a>
-    <?php endif; ?>
     <?php
     return ob_get_clean();
 }

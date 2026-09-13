@@ -6,7 +6,13 @@ require_once __DIR__ . '/../../functions/connection.php';
 function atelier_card_client($atelier, $type="futur") {
     ob_start();
     ?>
-    <div class="atelier <?= $type ?>" style="position: relative;">
+    <div class="atelier atelier-clickable atelier-filter-item <?= $type ?>"
+        data-filter-section="<?= htmlspecialchars($type) ?>"
+        data-praticien="<?= isset($atelier['praticien_id']) ? htmlspecialchars($atelier['praticien_id']) : '' ?>"
+        data-client="<?= isset($atelier['client_id']) ? htmlspecialchars($atelier['client_id']) : '' ?>"
+        data-date="<?= htmlspecialchars(date('Y-m-d', strtotime($atelier['date_hours']))) ?>"
+        data-type="<?= isset($atelier['type']) ? htmlspecialchars($atelier['type']) : '' ?>"
+        style="position: relative;">
         <div class="ml-2 mt-1 mb-1">
             <h2>
                 <?php

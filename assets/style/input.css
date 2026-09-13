@@ -105,8 +105,24 @@
     @apply hidden opacity-0 overflow-hidden transition-[max-height,opacity] duration-350 ease-in-out;
 }
 
-.atelier:hover .atelier-hidden {
+.atelier.deployed .atelier-hidden {
     @apply flex opacity-100 transition-[max-height,opacity] duration-350 ease-in-out;
+}
+
+.atelier .atelier-actions {
+    @apply hidden opacity-0 overflow-hidden transition-[max-height,opacity] duration-350 ease-in-out;
+}
+
+.atelier.deployed .atelier-actions {
+    @apply block opacity-100 transition-[max-height,opacity] duration-350 ease-in-out;
+}
+
+.atelier-clickable {
+    cursor: pointer;
+}
+
+.input-filter {
+    @apply border border-secondary rounded-md p-1 text-sm;
 }
 
 /* Popup */ 

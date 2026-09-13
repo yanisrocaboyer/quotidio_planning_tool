@@ -27,5 +27,44 @@ require_once './assets/js/praticien_register.php';
        
         ?>   
     </main>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Déployer / replier les ateliers au clic
+        document.addEventListener("click", function (e) {
+            var card = e.target.closest(".atelier-clickable");
+            if (!card) return;
+            if (e.target.closest("a, button, select, input, .atelier-actions")) return;
+            card.classList.toggle("deployed");
+        });
+
+        // Filtres par section
+        function applyAtelierFilters(section) {
+            var praticien = "";
+            var client = "";
+            var date = "";
+            var type = "";
+            document.querySelectorAll('.atelier-filter-select[data-section="' + section + '"]').forEach(function (el) {
+                if (el.dataset.filter === "praticien") praticien = el.value;
+                else if (el.dataset.filter === "client") client = el.value;
+                else if (el.dataset.filter === "date") date = el.value;
+                else if (el.dataset.filter === "type") type = el.value;
+            });
+            document.querySelectorAll('.atelier-filter-item[data-filter-section="' + section + '"]').forEach(function (card) {
+                var show = true;
+                if (praticien && String(card.dataset.praticien) !== praticien) show = false;
+                if (client && String(card.dataset.client) !== client) show = false;
+                if (date && card.dataset.date !== date) show = false;
+                if (type && card.dataset.type !== type) show = false;
+                card.style.display = show ? "" : "none";
+            });
+        }
+
+        document.querySelectorAll('.atelier-filter-select').forEach(function (el) {
+            el.addEventListener("change", function () {
+                applyAtelierFilters(el.dataset.section);
+            });
+        });
+    });
+    </script>
 </body>
 </html>

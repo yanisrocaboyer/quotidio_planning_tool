@@ -121,7 +121,16 @@ if (isset($_GET["action"]) && $_GET["action"] == "set_all_creation_atelier_to_pe
                     echo "<p class='text-green-900'>{$_GET["info_msg_green"]}</p>";
                 }
                 ?>
-                <h2 class="mt-2" id="pending">Ateliers en cours de gestion</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="pending">Ateliers en cours de gestion</h2>
+                    <?php
+                    render_atelier_filters('pending', array(
+                        'praticiens' => get_praticiens("validate"),
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <p>Actions rapides:</p>
                 <a href="?action=set_all_creation_atelier_to_pending">Ouvrir les candidatures pour tous les ateliers</a>
                 <?php
@@ -129,25 +138,43 @@ if (isset($_GET["action"]) && $_GET["action"] == "set_all_creation_atelier_to_pe
                 ?>
                 <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_pending as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier, true, "pending"); ?>
+                        <?php echo atelier_card_admin($atelier, "pending"); ?>
                     <?php endforeach; ?>
                 </div>
-                <h2 class="mt-2" id="futur">Ateliers à venir</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="futur">Ateliers à venir</h2>
+                    <?php
+                    render_atelier_filters('futur', array(
+                        'praticiens' => get_praticiens("validate"),
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_futur = get_ateliers("futur");
                 ?>
                 <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_futur as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier, true, "futur"); ?>
+                        <?php echo atelier_card_admin($atelier, "futur"); ?>
                     <?php endforeach; ?>
                 </div>
-                <h2 class="mt-2" id="pass">Ateliers passés</h2>
+                <div class="flex flex-wrap items-center mt-2">
+                    <h2 class="mr-2" id="pass">Ateliers passés</h2>
+                    <?php
+                    render_atelier_filters('pass', array(
+                        'praticiens' => get_praticiens("validate"),
+                        'clients' => get_clients(),
+                        'types' => get_atelier_types(),
+                    ));
+                    ?>
+                </div>
                 <?php
                 $ateliers_pass = get_ateliers("pass");
                 ?>
                 <div class="grid grid-cols-4">
                     <?php foreach ($ateliers_pass as $atelier): ?>
-                        <?php echo atelier_card_admin($atelier, true, "pass"); ?>
+                        <?php echo atelier_card_admin($atelier, "pass"); ?>
                     <?php endforeach; ?>
                 </div>
             </div>

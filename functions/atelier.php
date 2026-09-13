@@ -151,6 +151,35 @@ function del_atelier($id) {
     $request->execute(["id" => $id]);
 }
 
+function duplicate_atelier($id) {
+    global $sql;
+    try {
+        $atelier = get_atelier($id);
+        if (!$atelier) {
+            return false;
+        }
+
+        $created_at = (new DateTime())->format('Y-m-d H:i:s');
+        $sql_str = "INSERT INTO atelier (type, date_hours, duration, state, max_participants, participants, praticien_id, client_id, created_at) 
+                    VALUES (:type, :date_hours, :duration, 'creation', :max_participants, 0, NULL, :client_id, :created_at)";
+        $insert = $sql->prepare($sql_str);
+        $insert->bindParam(':type', $atelier['type']);
+        $insert->bindParam(':date_hours', $atelier['date_hours']);
+        $insert->bindParam(':duration', $atelier['duration']);
+        $insert->bindParam(':max_participants', $atelier['max_participants']);
+        $insert->bindParam(':client_id', $atelier['client_id']);
+        $insert->bindParam(':created_at', $created_at);
+
+        if ($insert->execute()) {
+            return $sql->lastInsertId();
+        }
+        return false;
+    } catch (Exception $e) {
+        error_log("[duplicate_atelier] Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
 function get_ateliers($type, $user="admin", $id=NULL) {
     if ($user == "admin") {
         if ($type == "pending") { 
