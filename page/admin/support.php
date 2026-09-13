@@ -8,6 +8,8 @@ if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $acce
 }
 else {
 
+handle_support_report($_POST);
+
 $TITLE = "Quotidio Planning - Admin";
 ?>
 <div class="dashboard">
@@ -19,7 +21,12 @@ $TITLE = "Quotidio Planning - Admin";
                     <h1 class="text-2xl">🛟 Support</h1>
                 </div>
                 <p>Cette page est destiné en cas de problème.</p>
-                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a></p>
+                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a> ou utiliser le formulaire si dessous.</p>
+                <?php
+                render_support_form(array(
+                    'email' => isset($user["identifiant"]) ? $user["identifiant"] : '',
+                ));
+                ?>
             </div>
         </div>
     </div>

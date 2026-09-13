@@ -11,6 +11,8 @@ else {
 
 $praticien_user = get_praticien($user['user_id']);
 
+handle_support_report($_POST);
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $result = add_atelier($_POST);
 
@@ -33,7 +35,14 @@ $TITLE = "Quotidio Planning - Praticien";
                     <h1 class="text-2xl">🛟 Support</h1>
                 </div>
                 <p>Cette page est destiné en cas de problème.</p>
-                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a></p>
+                <p>Si vous avez un problème avec l'outil de réservation, vous pouvez contacter <a href="mailto:contact@quotidio.com">contact@quotidio.com</a> ou utiliser le formulaire si dessous.</p>
+                <?php
+                render_support_form(array(
+                    'email' => isset($praticien_user["email"]) ? $praticien_user["email"] : '',
+                    'name' => isset($praticien_user["name"]) ? $praticien_user["name"] : '',
+                    'surname' => isset($praticien_user["surname"]) ? $praticien_user["surname"] : '',
+                ));
+                ?>
             </div>
         </div>
     </div>
