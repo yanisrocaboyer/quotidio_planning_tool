@@ -2,3 +2,4 @@
 .env
 page/test/
 node_modules/
+logs/mail_queue.log
