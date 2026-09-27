@@ -29,12 +29,28 @@ require_once './assets/js/praticien_register.php';
     </main>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Déployer / replier les ateliers au clic
+        function getRowCards(card) {
+            var grid = card.closest(".grid");
+            if (!grid) return [card];
+            var cards = Array.prototype.slice.call(grid.querySelectorAll(".atelier-clickable"));
+            var gridTop = grid.getBoundingClientRect().top;
+            var rowTop = Math.round(card.getBoundingClientRect().top - gridTop);
+            return cards.filter(function (c) {
+                if (c.style.display === "none") return false;
+                return Math.abs(Math.round(c.getBoundingClientRect().top - gridTop) - rowTop) < 8;
+            });
+        }
+
+        // Déployer / replier les ateliers au clic (toute la ligne)
         document.addEventListener("click", function (e) {
             var card = e.target.closest(".atelier-clickable");
             if (!card) return;
             if (e.target.closest("a, button, select, input, .atelier-actions")) return;
-            card.classList.toggle("deployed");
+
+            var deploy = !card.classList.contains("deployed");
+            getRowCards(card).forEach(function (c) {
+                c.classList.toggle("deployed", deploy);
+            });
         });
 
         // Filtres par section

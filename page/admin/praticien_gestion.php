@@ -34,8 +34,8 @@ $TITLE = "Quotidio Planning - Admin";
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
                             </div>
                             <div class="ml-3 leading-none mt-auto mb-auto">
-                                <p class="text-lg/4"><?= $praticien["name"] ?> <?= $praticien["surname"] ?></p>
-                                <p class="text-sm/4"><?= $praticien["email"] ?></p>
+                                <p class="text-lg/4"><?= h($praticien["name"]) ?> <?= h($praticien["surname"]) ?></p>
+                                <p class="text-sm/4"><?= h($praticien["email"]) ?></p>
                             </div>
                         </div>
                     </a>
@@ -56,8 +56,8 @@ $TITLE = "Quotidio Planning - Admin";
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
                             </div>
                             <div class="ml-3 leading-none mt-auto mb-auto">
-                                <p class="text-lg/4"><?php echo $praticien["name"] ?> <?php echo $praticien["surname"] ?></p>
-                                <p class="text-sm/4"><?php echo $praticien["email"] ?></p>
+                                <p class="text-lg/4"><?php echo h($praticien["name"]) ?> <?php echo h($praticien["surname"]) ?></p>
+                                <p class="text-sm/4"><?php echo h($praticien["email"]) ?></p>
                             </div>
                         </div>
                     </a>
@@ -78,8 +78,8 @@ $TITLE = "Quotidio Planning - Admin";
                                 <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
                             </div>
                             <div class="ml-3 leading-none mt-auto mb-auto">
-                                <p class="text-lg/4"><?php echo $praticien["name"] ?> <?php echo $praticien["surname"] ?></p>
-                                <p class="text-sm/4"><?php echo $praticien["email"] ?></p>
+                                <p class="text-lg/4"><?php echo h($praticien["name"]) ?> <?php echo h($praticien["surname"]) ?></p>
+                                <p class="text-sm/4"><?php echo h($praticien["email"]) ?></p>
                             </div>
                         </div>
                     </a>

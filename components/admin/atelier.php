@@ -21,7 +21,7 @@ function atelier_card_admin($atelier, $type="pending") {
                 <span class="absolute inline-flex rounded-full animate-ping bg-orange-500 opacity-75" style="width: 18px; height: 18px; left: 5px; top: 5px;"></span>
                 <span class="relative inline-flex rounded-full bg-orange-500" style="width: 18px; height: 18px; left: 5px; top: 5px;"></span>
             </span>
-       
+        
             <?php
         }
         ?>
@@ -37,7 +37,7 @@ function atelier_card_admin($atelier, $type="pending") {
                     <?php
                         $client = get_client($atelier['client_id']);
                         if (isset($client['name']) && !empty($client['name'])) {
-                            echo $client['name'];
+                            echo h($client['name']);
                         } else {
                             echo "A définir";
                         }
@@ -46,7 +46,7 @@ function atelier_card_admin($atelier, $type="pending") {
             </div>
             <div class="flex">
                 <span class="material-symbols-outlined">draw</span>
-                <p class="mt-auto mb-auto ml-1"><?= $atelier['type'] ?></p>
+                <p class="mt-auto mb-auto ml-1"><?= h($atelier['type']) ?></p>
             </div>
             <div class="flex atelier-hidden">
                 <span class="material-symbols-outlined">timer</span>
@@ -62,7 +62,7 @@ function atelier_card_admin($atelier, $type="pending") {
                     <?php
                         $praticien = get_praticien($atelier['praticien_id']);
                         if (isset($praticien['name']) && !empty($praticien['name'])) {
-                            echo $praticien['name'] . ' ' . $praticien['surname'];
+                            echo h($praticien['name'] . ' ' . $praticien['surname']);
                         } else {
                             echo "A définir";
                         }
@@ -93,36 +93,40 @@ function atelier_actions_admin($atelier) {
     <div class="mt-2">
         <h3><b>Actions :</b></h3>
         <?php if ($atelier["state"] == 'creation') { ?>
-            <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>">Ouvrir les candidatures pour les praticiens</a><br>
+            <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Ouvrir les candidatures pour les praticiens</a><br>
             <div class="flex">
-                <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
+                <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Valider l'atelier</a><br>
                 <?php
                 info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
                 ?>
             </div>
         <?php } else if ($atelier["state"] == "pending") { ?>
             <div class="flex">
-                <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>">Valider l'atelier</a><br>
+                <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Valider l'atelier</a><br>
                 <?php
                 info("Valider l'atelier vous empêchera à la suite de modifier le type, le nombre de participants max, et les affiliations.");
                 ?>
             </div>
         <?php } ?>
-        <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>" class="danger">Supprimer l'atelier</a><br>
-        <a href="?action=duplicateAtelier&id=<?php echo $atelier['id'] ?>">Dupliquer l'atelier</a>
+        <a href="?action=deleteAtelier&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>" class="danger">Supprimer l'atelier</a><br>
+        <a href="?action=duplicateAtelier&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Dupliquer l'atelier</a>
     </div>
     <?php
     if (isset($_GET['action']) && isset($_GET['pid']) && isset($_GET['id'])) {
         $id = $_GET['id'];
         $pid = $_GET['pid'];
         if ($_GET['action'] === 'candidateAccept') {
+            csrf_check();
             set_participation_state($pid, 'accept', $id, $_GET["uid"]);
             header("Location: ?id={$id}&msg=candidateAcceptSuccess");
+            exit;
         } elseif ($_GET['action'] === 'candidateRefuse') {
+            csrf_check();
             set_participation_state($pid, 'refuse', $id);
             header("Location: ?id={$id}&msg=candidatureRefuseSuccess");
+            exit;
         }
-   
+    
     }
 }
 
@@ -131,25 +135,31 @@ function atelier_action_state($atelier) {
         return;
     }
 
+    if (!in_array($_GET['action'], array('setStateOpen', 'setStateValidate', 'deleteAtelier', 'duplicateAtelier'))) {
+        return;
+    }
+
+    csrf_check();
+
     switch ($_GET['action']) {
         case 'setStateOpen':
             set_state_atelier($atelier['id'], 'pending');
-            header("Location: ?id={$atelier['id']}&infoMsg=Candidatures ouvertes");
+            header("Location: ?id={$atelier['id']}&infoMsg=" . urlencode("Candidatures ouvertes"));
             exit;
         case 'setStateValidate':
             set_state_atelier($atelier['id'], 'validate');
-            header("Location: ?id={$atelier['id']}&infoMsg=Atelier validé");
+            header("Location: ?id={$atelier['id']}&infoMsg=" . urlencode("Atelier validé"));
             exit;
         case 'deleteAtelier':
             del_atelier($atelier['id']);
-            header("Location: index?id={$atelier['id']}&infoMsg=Atelier supprimé");
+            header("Location: index?id={$atelier['id']}&infoMsg=" . urlencode("Atelier supprimé"));
             exit;
         case 'duplicateAtelier':
             $new_id = duplicate_atelier($atelier['id']);
             if ($new_id) {
-                header("Location: atelier_gestion?id={$new_id}&infoMsg=Atelier dupliqué avec succès");
+                header("Location: atelier_gestion?id={$new_id}&infoMsg=" . urlencode("Atelier dupliqué avec succès"));
             } else {
-                header("Location: atelier_gestion?id={$atelier['id']}&infoMsg=Erreur lors de la duplication");
+                header("Location: atelier_gestion?id={$atelier['id']}&infoMsg=" . urlencode("Erreur lors de la duplication"));
             }
             exit;
         default:

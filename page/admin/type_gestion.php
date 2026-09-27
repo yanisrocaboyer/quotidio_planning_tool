@@ -16,6 +16,7 @@ $successMsg = '';
 $errorMsg = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    csrf_check();
     if (isset($_POST["add_type_submit"])) {
         $type_name = trim($_POST["add_type_input"]);
         if (!empty($type_name)) {
@@ -66,6 +67,7 @@ $types = get_atelier_types();
                                         </td>
                                         <td class="px-4 py-2">
                                             <form method="POST" style="display:inline;">
+                                                <?= csrf_field() ?>
                                                 <input type="hidden" name="type_to_delete" value="<?php echo htmlspecialchars($row['name']); ?>">
                                                 <button class="danger" type="submit" name="delete_type_submit" onclick="return confirm('Supprimer ce type ?');">
                                                     Supprimer

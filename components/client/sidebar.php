@@ -27,12 +27,18 @@
     </div>
     <div class="text-xl mt-auto pt-3 bg-secondary rounded-t-xl">
         <div class="ml-5 mb-5">
-            <div>
-                <a href="/partenaire/support" class="flex items-center mt-2 support">
-                    <span class="material-symbols-outlined">support</span>
-                    <p class="ml-1">Support</p>
-                </a>
-            </div>
+        <div>
+            <a href="/help/updates?type=partenaire" class="flex items-center mt-2 nouveautes">
+                <span class="material-symbols-outlined">new_releases</span>
+                <p class="ml-1">Nouveautés</p>
+            </a>
+        </div>
+        <div>
+            <a href="/partenaire/support" class="flex items-center mt-2 support">
+                <span class="material-symbols-outlined">support</span>
+                <p class="ml-1">Support</p>
+            </a>
+        </div>
             <div>
                 <a href="../logout" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>

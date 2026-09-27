@@ -34,8 +34,8 @@ function add_atelier($post) {
             $state = "pending";
         }
 
-        $sql_str = "INSERT INTO atelier (type, date_hours, state, max_participants, client_id, created_at, duration) 
-            VALUES (:type, :date_hours, :state, :max_participants, :client_id, :created_at, :time)";
+        $sql_str = "INSERT INTO atelier (type, date_hours, state, max_participants, participants, client_id, created_at, duration) 
+            VALUES (:type, :date_hours, :state, :max_participants, 0, :client_id, :created_at, :time)";
         $insert = $sql->prepare($sql_str);
 
         $insert->bindParam(':type', $type);

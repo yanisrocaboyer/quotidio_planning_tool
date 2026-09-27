@@ -3,24 +3,22 @@ $TITLE = "Quotidio Planning - Connexion";
 require_once './functions/connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    try {
-        $email = isset($_POST['emailInput']) ? trim($_POST['emailInput']) : '';
-        $password = isset($_POST['passwordInput']) ? trim($_POST['passwordInput']) : '';
+    csrf_check();
 
-        if (empty($email) || empty($password)) {
-            header("Location: ?err=INPUT_NO_FILL");
-            exit;
-        }
+    $email = isset($_POST['emailInput']) ? trim($_POST['emailInput']) : '';
+    $password = isset($_POST['passwordInput']) ? trim($_POST['passwordInput']) : '';
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            header("Location: ?err=INVALID_EMAIL_FORMAT");
-            exit;
-        }
-
-        login($email, $password, "partenaire");
-    } catch (Exception $e) {
-        echo $e;
+    if (empty($email) || empty($password)) {
+        header("Location: ?err=INPUT_NO_FILL");
+        exit;
     }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header("Location: ?err=INVALID_EMAIL_FORMAT");
+        exit;
+    }
+
+    login($email, $password, "partenaire");
 }
 
 if (isset($_SESSION["token"])) {
@@ -48,6 +46,7 @@ if (isset($_SESSION["token"])) {
             }
             ?>
             <form class="con-form" method="POST">
+                <?= csrf_field() ?>
                 <div class="mt-5">
                     <p>Email</p>
                     <input class="input-primary" type="email" name="emailInput" placeholder="johndoe@example.com"/>

@@ -43,6 +43,9 @@ $TITLE = "Quotidio Planning - Praticien";
                     'surname' => isset($praticien_user["surname"]) ? $praticien_user["surname"] : '',
                 ));
                 ?>
+                <p>Autres pages:</p>
+                <p class="flex"><a class="mr-2" target="_blank" href="/page/help/convention">Convention</a></p>
+                <br>
             </div>
         </div>
     </div>

@@ -8,13 +8,16 @@ if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $acce
 } else {
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    csrf_check();
     $result = add_client($_POST);
 
     if ($result != "error") {
-        header("Location: ?error=success&password={$result}");
+        set_flash("client_password", $result);
+        header("Location: ?error=success");
         exit;
     } else {
-        header("Location: ?error=". $result);
+        header("Location: ?error=". urlencode($result));
+        exit;
     }
 }
 
@@ -29,6 +32,7 @@ $TITLE = "Quotidio Planning - Admin";
                     <div class="popup-content">
                         <h1 class="text-center">Ajouter un partenaire</h1>
                         <form method="POST">
+                            <?= csrf_field() ?>
                             <div class="mt-5">
                                 <p>Nom</p>
                                 <input class="input-primary" type="text" name="nameInput" placeholder="Nom du client" required/>
@@ -60,23 +64,19 @@ $TITLE = "Quotidio Planning - Admin";
                 if (isset($_GET["msg"]) && $_GET["msg"] == "accountDeleted") {
                     echo "<p class='success'>Compte supprimer avec succès !</p>";
                 } else if (isset($_GET["msg"])) {
-                    echo "<p>{$_GET['msg']}</p>";
+                    echo "<p>" . h($_GET["msg"]) . "</p>";
                 }
                 ?>
                 <?php
+                if (get_flash("client_password") !== null) {
+                    echo "<p class='text-green-900'>Création du partenaire avec succès !</p>";
+                    echo "<p class='text-green-900'>Mot de passe du partenaire: " . h(get_flash("client_password")) . "</p>";
+                }
                 if(isset($_GET["error"])){
                     if ($_GET["error"] == "success"){
-                    if ($_GET["password"] != "error:internal" || $_GET["password"] != "error:user_creation_failed" || $_GET["password"] != "error:invalid_email"){
                     ?>
                     <p class="text-green-900">Création du partenaire avec succès !</p>
-                    <p class="text-green-900">Mot de passe du partenaire: <?= $_GET["password"] ?></p>
-                    <?php      
-                    } else {
-                        ?>
-                        <p class="text-red-500">Erros lors de la création du compte partenaire !</p>
-                        <p class="text-red-500">Type d'erreur: <?= $_GET["password"] ?></p>
-                        <?php
-                    }          
+                    <?php
                     }
                     else {
                     ?>

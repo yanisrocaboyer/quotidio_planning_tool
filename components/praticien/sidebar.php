@@ -1,4 +1,5 @@
 <div class="side-bar">
+    <a href="/praticien/account">
     <div class="m-1 p-2 flex">
         <div>
             <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="40px" draggable="false">
@@ -8,6 +9,7 @@
             <p class="text-gray-500 text-xs"><?php echo $user["identifiant"] ?></p>
         </div>
     </div>
+    </a>
     <hr class="text-gray-200">
     <div class="m-1 p-2 text-xl">
         <p>Ateliers</p>
@@ -33,12 +35,18 @@
     </div>
     <div class="text-xl mt-auto pt-3 bg-secondary rounded-t-xl">
         <div class="ml-5 mb-5">
-            <div>
-                <a href="/praticien/support" class="flex items-center mt-2 support">
-                    <span class="material-symbols-outlined">support</span>
-                    <p class="ml-1">Support</p>
-                </a>
-            </div>
+        <div>
+            <a href="/help/updates?type=praticien" class="flex items-center mt-2 nouveautes">
+                <span class="material-symbols-outlined">new_releases</span>
+                <p class="ml-1">Nouveautés</p>
+            </a>
+        </div>
+        <div>
+            <a href="/praticien/support" class="flex items-center mt-2 support">
+                <span class="material-symbols-outlined">support</span>
+                <p class="ml-1">Support</p>
+            </a>
+        </div>
             <div>
                 <a href="../logout" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>

@@ -3,8 +3,8 @@ require_once './functions/connection.php';
 require_once './functions/atelier.php';
 require_once './components/client/atelier.php';
 
-$user = verif_token($_SESSION["token"]);
-$access = $user["type"];
+$user = isset($_SESSION["token"]) ? verif_token($_SESSION["token"]) : null;
+$access = $user !== null ? $user["type"] : null;
 if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $access != "client") {
     include "./page/error/403.php";
 }

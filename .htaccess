@@ -1,6 +1,17 @@
 RewriteEngine On
 RewriteBase /
 
+Options -Indexes
+
+# Blocage des fichiers sensibles / dotfiles (.env, .git, etc.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+RewriteRule ^\.env - [F,L]
+RewriteRule ^\.git(/|$) - [F,L]
+RewriteRule ^logs(/|$) - [F,L]
+RewriteRule ^db(/|$) - [F,L]
+
 RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|meta-webindexer|Applebot) [NC]
 RewriteRule ^ - [F,L]
 

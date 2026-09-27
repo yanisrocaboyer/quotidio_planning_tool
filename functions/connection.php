@@ -2,6 +2,7 @@
 require_once 'generation.php';
 require_once 'db.php';
 require_once 'mail.php';
+require_once 'security.php';
 
 function login($username, $password, $type) {
     global $sql, $base_url;
@@ -13,14 +14,106 @@ function login($username, $password, $type) {
         ]);
         $sqlResult = $sqlRequest->fetch(PDO::FETCH_ASSOC);
 
-        if($sqlResult && password_verify($password, $sqlResult['password'])) {
+        if ($sqlResult && password_verify($password, $sqlResult['password'])) {
+            session_regenerate_id(true);
             $_SESSION['token'] = $sqlResult['token'];
             header('Location: ' . $base_url . '/page/' . $type . '/');
         } else {
             header("Location: ?err=INVALID_USER");
         }
     } catch (Exception $e) {
-        echo $e;
+        error_log("[login] Exception: " . $e->getMessage());
+        header("Location: ?err=INVALID_USER");
+    }
+}
+
+/**
+ * Récupère un utilisateur via son id
+ * @param int $user_id
+ * @return array|false
+ */
+function get_user_by_id($user_id) {
+    global $sql;
+    try {
+        $sqlQuery = "SELECT * FROM users WHERE id = :id LIMIT 1";
+        $sqlRequest = $sql->prepare($sqlQuery);
+        $sqlRequest->execute([
+            'id' => $user_id
+        ]);
+        $sqlResult = $sqlRequest->fetch(PDO::FETCH_ASSOC);
+        if ($sqlResult) {
+            return $sqlResult;
+        } else {
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("[get_user_by_id] Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * @param int 
+ * @param string 
+ * @return string
+ */
+function update_user_password($user_id, $new_password) {
+    global $sql;
+    try {
+        if (empty($user_id) || empty($new_password)) {
+            return "error:missing_data";
+        }
+
+        $hashed = password_hash($new_password, PASSWORD_BCRYPT);
+        $request = $sql->prepare("UPDATE users SET password = :password WHERE id = :id");
+        $request->bindParam(":password", $hashed);
+        $request->bindParam(":id", $user_id);
+        $request->execute();
+
+        if ($request->rowCount() === 0) {
+            return "error:not_found_or_no_change";
+        }
+        return "success_pwd";
+    } catch (Exception $e) {
+        error_log("[update_user_password] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+/**
+ * @param int 
+ * @param string 
+ * @return string 
+ */
+function update_user_identifiant($user_id, $new_identifiant) {
+    global $sql;
+    try {
+        if (empty($user_id) || empty($new_identifiant)) {
+            return "error:missing_data";
+        }
+        if (!filter_var($new_identifiant, FILTER_VALIDATE_EMAIL)) {
+            return "error:invalid_email";
+        }
+
+        // Vérifie si cet identifiant n'existe pas déjà pour un autre utilisateur
+        $check = $sql->prepare("SELECT id FROM users WHERE identifiant = :identifiant AND id != :id LIMIT 1");
+        $check->execute(["identifiant" => $new_identifiant, "id" => $user_id]);
+        if ($check->fetch(PDO::FETCH_ASSOC)) {
+            return "error:identifiant_exists";
+        }
+
+        $request = $sql->prepare("UPDATE users SET identifiant = :identifiant WHERE id = :id");
+        $request->bindParam(":identifiant", $new_identifiant);
+        $request->bindParam(":id", $user_id);
+        $request->execute();
+
+        if ($request->rowCount() === 0) {
+            return "error:not_found_or_no_change";
+        }
+        return "success";
+    } catch (Exception $e) {
+        error_log("[update_user_identifiant] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
     }
 }
 
@@ -419,6 +512,23 @@ function set_praticien_to_valide($id) {
         set_praticien_state($id, "validate");
         $praticien = get_praticien($id);
 
+        $existing_user = false;
+        $check = $sql->prepare("SELECT * FROM `users` WHERE identifiant = :identifiant AND type = 'praticien' LIMIT 1");
+        $check->execute(["identifiant" => $praticien["email"]]);
+        $existing_user = $check->fetch(PDO::FETCH_ASSOC);
+
+        if (!$existing_user && !empty($praticien["user_id"])) {
+            $check2 = $sql->prepare("SELECT * FROM `users` WHERE id = :id AND type = 'praticien' LIMIT 1");
+            $check2->execute(["id" => $praticien["user_id"]]);
+            $existing_user = $check2->fetch(PDO::FETCH_ASSOC);
+        }
+
+        if ($existing_user) {
+            $link = $sql->prepare("UPDATE `praticien` SET user_id=:user_id WHERE id=:id");
+            $link->execute(["user_id" => $existing_user["id"], "id" => $id]);
+            return "account_exists";
+        }
+
         $password = generateToken(12);
         $request = $sql->prepare("INSERT INTO `users` (identifiant, password, token, type, user_id) VALUES (:identifiant, :password, :token, 'praticien', :user_id) ");
         $request->execute([
@@ -483,5 +593,190 @@ function get_praticien_justificatif($id) {
         return $result;
     } else {
         return false;
+    }
+}
+
+function get_praticien_fichier_blob($file) {
+    if (!isset($file) || !is_array($file) || $file["error"] !== UPLOAD_ERR_OK) {
+        error_log("[get_praticien_fichier_blob] Fichier invalide ou erreur d'upload");
+        return false;
+    }
+    $ext = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    if (!in_array($ext, ["jpeg", "jpg", "png", "pdf"])) {
+        error_log("[get_praticien_fichier_blob] Extension invalide: ." . $ext);
+        return false;
+    }
+    $blob = file_get_contents($file["tmp_name"]);
+    if ($blob === false) {
+        error_log("[get_praticien_fichier_blob] Impossible de lire le contenu du fichier");
+        return false;
+    }
+    return $blob;
+}
+
+function update_praticien_info($id, $post) {
+    global $sql;
+    try {
+        $praticien = get_praticien($id);
+        if (!$praticien) {
+            return "error:not_found";
+        }
+
+        $email = isset($post["email"]) ? htmlspecialchars(trim($post["email"]), ENT_QUOTES, "UTF-8") : "";
+        $tel = isset($post["tel"]) ? htmlspecialchars(trim($post["tel"]), ENT_QUOTES, "UTF-8") : "";
+        $siret = isset($post["siret"]) ? htmlspecialchars(trim($post["siret"]), ENT_QUOTES, "UTF-8") : "";
+        $assurance = isset($post["assurance"]) ? htmlspecialchars(trim($post["assurance"]), ENT_QUOTES, "UTF-8") : "";
+        $assurance_date = isset($post["assurance_date"]) ? htmlspecialchars(trim($post["assurance_date"]), ENT_QUOTES, "UTF-8") : "";
+
+        if (empty($email) || empty($tel) || empty($siret)) {
+            return "error:missing_data";
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return "error:invalid_email";
+        }
+
+        $changed = ($email !== $praticien["email"])
+            || ($tel !== $praticien["tel"])
+            || ($siret !== $praticien["siret"])
+            || ($assurance !== $praticien["assurance"])
+            || ($assurance_date !== $praticien["assurance_date"]);
+
+        if ($email !== $praticien["email"]) {
+            $check = $sql->prepare("SELECT id FROM praticien WHERE email = :email AND id != :id LIMIT 1");
+            $check->execute(["email" => $email, "id" => $id]);
+            if ($check->fetch(PDO::FETCH_ASSOC)) {
+                return "error:email_exists";
+            }
+            $updUser = $sql->prepare("UPDATE `users` SET identifiant=:identifiant WHERE user_id=:praticien_id AND type='praticien'");
+            $updUser->execute(["identifiant" => $email, "praticien_id" => $id]);
+        }
+
+        $update = $sql->prepare("UPDATE praticien SET email=:email, tel=:tel, siret=:siret, assurance=:assurance, assurance_date=:assurance_date WHERE id=:id");
+        $update->execute([
+            "email" => $email,
+            "tel" => $tel,
+            "siret" => $siret,
+            "assurance" => $assurance,
+            "assurance_date" => $assurance_date,
+            "id" => $id
+        ]);
+
+        if ($changed) {
+            set_praticien_state($id, "pending");
+        }
+
+        return "success";
+    } catch (Exception $e) {
+        error_log("[update_praticien_info] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+function update_praticien_justificatif($id, $type, $file) {
+    global $sql;
+    try {
+        $columns = [
+            "siret" => "siret_justificatif",
+            "assurance" => "assurance_justificatif"
+        ];
+        if (!isset($columns[$type])) {
+            return "error:invalid_type";
+        }
+
+        $praticien = get_praticien($id);
+        if (!$praticien) {
+            return "error:not_found";
+        }
+
+        $blob = get_praticien_fichier_blob($file);
+        if ($blob === false) {
+            return "error:invalid_file";
+        }
+
+        $sql_str = "UPDATE praticien SET {$columns[$type]}=:blob WHERE id=:id";
+        $request = $sql->prepare($sql_str);
+        $request->bindParam(":blob", $blob, PDO::PARAM_LOB);
+        $request->bindParam(":id", $id);
+        $request->execute();
+
+        set_praticien_state($id, "pending");
+        return "success";
+    } catch (Exception $e) {
+        error_log("[update_praticien_justificatif] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+function add_pratique_justificatif($id, $pratique, $file) {
+    global $sql;
+    try {
+        $pratique_name = htmlspecialchars(trim($pratique), ENT_QUOTES, "UTF-8");
+        if (empty($pratique_name)) {
+            return "error:missing_data";
+        }
+
+        $blob = get_praticien_fichier_blob($file);
+        if ($blob === false) {
+            return "error:invalid_file";
+        }
+
+        $insert = $sql->prepare("INSERT INTO praticien_justificatif (praticien_id, pratique, justificatif) VALUES (:praticien_id, :pratique, :justificatif)");
+        $insert->bindParam(":praticien_id", $id);
+        $insert->bindParam(":pratique", $pratique_name);
+        $insert->bindParam(":justificatif", $blob, PDO::PARAM_LOB);
+        $insert->execute();
+
+        set_praticien_state($id, "pending");
+        return "success";
+    } catch (Exception $e) {
+        error_log("[add_pratique_justificatif] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+function update_pratique_justificatif($id, $justif_id, $file) {
+    global $sql;
+    try {
+        $blob = get_praticien_fichier_blob($file);
+        if ($blob === false) {
+            return "error:invalid_file";
+        }
+
+        $request = $sql->prepare("UPDATE praticien_justificatif SET justificatif=:blob WHERE id=:id AND praticien_id=:praticien_id");
+        $request->bindParam(":blob", $blob, PDO::PARAM_LOB);
+        $request->bindParam(":id", $justif_id);
+        $request->bindParam(":praticien_id", $id);
+        $request->execute();
+
+        if ($request->rowCount() == 0) {
+            return "error:not_found";
+        }
+
+        set_praticien_state($id, "pending");
+        return "success";
+    } catch (Exception $e) {
+        error_log("[update_pratique_justificatif] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
+    }
+}
+
+function remove_pratique_justificatif($id, $justif_id) {
+    global $sql;
+    try {
+        $request = $sql->prepare("DELETE FROM praticien_justificatif WHERE id=:id AND praticien_id=:praticien_id");
+        $request->execute([
+            "id" => $justif_id,
+            "praticien_id" => $id
+        ]);
+
+        if ($request->rowCount() == 0) {
+            return "error:not_found";
+        }
+
+        set_praticien_state($id, "pending");
+        return "success";
+    } catch (Exception $e) {
+        error_log("[remove_pratique_justificatif] Exception: " . $e->getMessage());
+        return "error:" . $e->getMessage();
     }
 }

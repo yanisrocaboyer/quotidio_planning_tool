@@ -31,13 +31,15 @@ if (!isset($_GET["id"])) {
 $id = $_GET["id"];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    csrf_check();
     $result = edit_atelier($id, $_POST);
 
     if ($result != "error") {
         header("Location: ?id={$id}&error=atelierUpdateSuccess");
         exit;
     } else {
-        header("Location: ?id={$id}&error=atelierUpdateFailed&msg=". $result);
+        header("Location: ?id={$id}&error=atelierUpdateFailed&msg=". urlencode($result));
+        exit;
     }
 }
 
@@ -62,17 +64,18 @@ if ($atelier) {
                 <h2>Gestion d'atelier</h2>
                 <?php
                 if (isset($_GET["infoMsg"])) {
-                    echo "<p class='text-blue-500'>{$_GET['infoMsg']}</p>";
+                    echo "<p class='text-blue-500'>" . h($_GET["infoMsg"]) . "</p>";
                 }
                 ?>
 
                 <!-- # Informations -->
 
                 <form method="POST"">
+                    <?= csrf_field() ?>
                     <div class="mt-2">
                         <?php
                         if (isset($_GET["error"]) && $_GET["error"] == "atelierUpdateFailed") {
-                            echo "<p class='text-red-500'>Error lors de l'édition de l'atelier: {$_GET['msg']} </p>";
+                            echo "<p class='text-red-500'>Erreur lors de l'édition de l'atelier: " . h($_GET['msg']) . " </p>";
                         } else if (isset($_GET["error"]) && $_GET["error"] == "atelierUpdateSuccess") {
                             echo "<p class='text-green-600'>Mise à jour de l'atelier réussis !</p>";
                         }
@@ -80,7 +83,7 @@ if ($atelier) {
                         <h3 ><b>Informations :</b></h3>
                         <div>
                             <label for="typeInput">Type:</label>
-                            <input type="text" id="typeInput" name="typeInput" value="<?php echo $atelier['type'] ?>" required>
+                            <input type="text" id="typeInput" name="typeInput" value="<?php echo htmlspecialchars($atelier['type']) ?>" required>
                         </div>
                         <?php 
                         $date_hours = $atelier['date_hours'];
@@ -171,10 +174,10 @@ if ($atelier) {
                                     <img src="/assets/unknown.jpg" alt="Unknown User" class="rounded-md" width="50px" draggable="false">
                                 </div>
                                 <div class="ml-3 leading-none mt-auto mb-auto">
-                                    <p><a href="user_gestion?type=praticien&user_id=<?= $praticien["id"] ?>" target="_blank">Candidature de: <?= $praticien["name"] ?> <?= $praticien["surname"] ?></a></p>
+                                    <p><a href="user_gestion?type=praticien&user_id=<?= htmlspecialchars($praticien["id"]) ?>" target="_blank">Candidature de: <?= h($praticien["name"] ?? "") ?> <?= h($praticien["surname"] ?? "") ?></a></p>
                                     <div class="flex mt-1">
-                                        <p><a href="?id=<?= $id ?>&action=candidateAccept&pid=<?= $candidature["id"]?>&uid=<?= $praticien["id"]?>">Accepter</a></p>
-                                        <p><a class="ml-2" href="?id=<?= $id ?>&action=candidateRefuse&pid=<?= $candidature["id"]?>">Refuser</a></p>
+                                        <p><a href="?id=<?= $id ?>&action=candidateAccept&pid=<?= $candidature["id"]?>&uid=<?= $praticien["id"]?>&<?= csrf_query() ?>">Accepter</a></p>
+                                        <p><a class="ml-2" href="?id=<?= $id ?>&action=candidateRefuse&pid=<?= $candidature["id"]?>&<?= csrf_query() ?>">Refuser</a></p>
                                     </div>
                                 </div>
                             </div>

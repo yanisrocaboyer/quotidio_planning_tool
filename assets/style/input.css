@@ -102,19 +102,25 @@
 }
 
 .atelier .atelier-hidden {
-    @apply hidden opacity-0 overflow-hidden transition-[max-height,opacity] duration-350 ease-in-out;
+    @apply flex opacity-0 overflow-hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
 .atelier.deployed .atelier-hidden {
-    @apply flex opacity-100 transition-[max-height,opacity] duration-350 ease-in-out;
+    @apply flex opacity-100;
+    max-height: 500px;
 }
 
 .atelier .atelier-actions {
-    @apply hidden opacity-0 overflow-hidden transition-[max-height,opacity] duration-350 ease-in-out;
+    @apply block opacity-0 overflow-hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
 .atelier.deployed .atelier-actions {
-    @apply block opacity-100 transition-[max-height,opacity] duration-350 ease-in-out;
+    @apply block opacity-100;
+    max-height: 500px;
 }
 
 .atelier-clickable {
@@ -203,6 +209,10 @@ a.danger {
 
 a.support {
     @apply text-white hover:text-blue-300
+}
+
+a.nouveautes {
+    @apply text-white hover:text-yellow-300
 }
 
 a.logout {

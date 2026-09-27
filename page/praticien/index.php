@@ -3,8 +3,8 @@ require_once './functions/connection.php';
 require_once './functions/atelier.php';
 require_once './components/praticien/atelier.php';
 
-$user = verif_token($_SESSION["token"]);
-$access = $user["type"];
+$user = isset($_SESSION["token"]) ? verif_token($_SESSION["token"]) : null;
+$access = $user !== null ? $user["type"] : null;
 if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $access != "praticien") {
     include "./page/error/403.php";
 } else {
@@ -119,7 +119,9 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                 $participations = get_participations_praticien($praticien_user["id"], 4);
                 ?>
                 <div class="grid grid-cols-4">
-                    <?php if (empty($participations)): ?>
+                    <?php if ($praticien_user["state"] != "validate"): ?>
+                        <p style="grid-column: 1 / -1;" class="text-orange-500">Votre compte est en attente d'adhésion, vous ne pouvez donc pas accédez aux candidatures d'ateliers</p>
+                    <?php elseif (empty($participations)): ?>
                         <p style="grid-column: 1 / -1;">Aucune</p>
                     <?php else: ?>
                         <?php foreach ($participations as $participation): 
@@ -142,6 +144,11 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                 ?>
                 <div class="grid grid-cols-4">
                     <?php
+                    if ($praticien_user["state"] != "validate") {
+                        ?>
+                        <p style="grid-column: 1 / -1;" class="text-orange-500">Votre compte est en attente d'adhésion, vous ne pouvez donc pas accédez aux candidatures d'ateliers</p>
+                        <?php
+                    } else {
                     $found = false;
                     if (!empty($ateliers_disponibles)):
                         foreach ($ateliers_disponibles as $atelier):
@@ -157,7 +164,8 @@ if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
                     if (!$found):
                     ?>
                         <p style="grid-column: 1 / -1;">Aucun (ou aucun dont vous n'avez pas candidaté)</p>
-                    <?php endif; ?>
+                    <?php endif;
+                    } ?>
                 </div>
             </div>
         </div>
