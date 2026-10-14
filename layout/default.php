@@ -1,6 +1,11 @@
 <?php
 $TITLE = "Quotidio Planning";
 require_once './assets/js/praticien_register.php';
+
+$month = (int) date('n');
+$is_october = ($month === 10);
+$css_file = $is_october ? 'output-october.css' : 'output.css';
+$bg_img = $is_october ? '/assets/bg-october.png' : '/assets/bg.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,10 +14,10 @@ require_once './assets/js/praticien_register.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/style/output.css?v=<?php echo filemtime('assets/style/output.css'); ?>">
+    <link rel="stylesheet" href="/assets/style/<?php echo $css_file; ?>?v=<?php echo filemtime('assets/style/' . $css_file); ?>">
     <title><?php echo $TITLE; ?></title>
 </head>
-<body style="background-image: url('/assets/bg.png')" class="bg-no-repeat bg-bottom bg-cover">
+<body style="background-image: url('<?php echo $bg_img; ?>')" class="bg-no-repeat bg-bottom bg-cover">
     <main id="content">
         <?php 
             if (isset($page_content)) {

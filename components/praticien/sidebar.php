@@ -47,12 +47,28 @@
                 <p class="ml-1">Support</p>
             </a>
         </div>
+        <?php
+        if (!isset($_SESSION["adminTok"])) {
+            ?>
             <div>
                 <a href="../logout" class="flex items-center mt-1 logout">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="ml-1">Déconnexion</p>
                 </a>
             </div>
-        </div>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div>
+                <a href="../logout?type=admin" class="flex items-center mt-1 logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    <p class="ml-1">Repasser en admin</p>
+                </a>
+            </div>
+            </div>
+            <?php
+        }
+        ?>
     </div>
 </div>

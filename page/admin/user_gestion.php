@@ -12,6 +12,11 @@ else {
 
 $TITLE = "Quotidio Planning - Admin";
 
+if (isset($_GET["action"]) && $_GET["action"] == "connectAs") {
+    login_as($_GET["type"], $_GET["user_id"], $_SESSION["token"]);
+    exit;
+}
+
 if (!isset($_GET["type"]) || !isset($_GET["user_id"])) {
     ?>
     <div class="dashboard">
@@ -142,6 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     <div class="mt-2">
                         <h3 ><b>Actions :</b></h3>
+                        <a href="?action=connectAs&type=praticien&user_id=<?= $praticien["user_id"] ?>">Se connecter en tant que l'utilisateur</a><br>
                         <?php
                         if ($praticien["state"] == "pending") {
                         ?>
@@ -251,6 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 }
                         } else {
                             ?>
+                            <a href="?action=connectAs&type=client&user_id=<?= $client["user_id"] ?>">Se connecter en tant que l'utilisateur</a><br>
                             <a href="?action=deleteClient&type=client&user_id=<?= $client["id"] ?>" class="danger">Supprimer le compte</a>
                             <?php
                                 if (isset($_GET['action']) && $_GET['action'] === 'deleteClient' && isset($_GET['user_id']) && $_GET['user_id'] == $client["id"]) {

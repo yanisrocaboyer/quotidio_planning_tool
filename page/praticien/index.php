@@ -10,6 +10,7 @@ if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $acce
 } else {
 
 $praticien_user = get_praticien($user['user_id']);
+global $adminTok, $adminId;
 
 $TITLE = "Quotidio Planning - Praticien";
 

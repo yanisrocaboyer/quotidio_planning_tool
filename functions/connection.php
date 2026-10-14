@@ -3,6 +3,7 @@ require_once 'generation.php';
 require_once 'db.php';
 require_once 'mail.php';
 require_once 'security.php';
+require_once 'logs.php';
 
 function login($username, $password, $type) {
     global $sql, $base_url;
@@ -17,6 +18,37 @@ function login($username, $password, $type) {
         if ($sqlResult && password_verify($password, $sqlResult['password'])) {
             session_regenerate_id(true);
             $_SESSION['token'] = $sqlResult['token'];
+            add_logs($sqlResult["id"], $sqlResult["identifiant"] . ": login");
+            header('Location: ' . $base_url . '/page/' . $type . '/');
+        } else {
+            header("Location: ?err=INVALID_USER");
+        }
+    } catch (Exception $e) {
+        error_log("[login] Exception: " . $e->getMessage());
+        header("Location: ?err=INVALID_USER");
+    }
+}
+
+function login_as($type, $user_id, $adminToken) {
+    global $sql, $base_url;
+    try {
+        $verif = verif_token($adminToken);
+        $_SESSION["adminTok"] = $verif["token"];
+        $_SESSION["adminId"] = $verif["id"];
+        if ($verif["type"] == "admin"){
+            $sqlQuery = "SELECT * FROM users WHERE id = :id LIMIT 1";
+            $sqlRequest = $sql->prepare($sqlQuery);
+            $sqlRequest->execute([
+                'id' => $user_id
+            ]);
+            $sqlResult = $sqlRequest->fetch(PDO::FETCH_ASSOC);
+    
+            session_regenerate_id(true);
+            $_SESSION['token'] = $sqlResult['token'];
+            add_logs($sqlResult["id"], $sqlResult["identifiant"] . ": admin login");
+            if ($type == "client"){
+                $type = "partenaire";
+            }
             header('Location: ' . $base_url . '/page/' . $type . '/');
         } else {
             header("Location: ?err=INVALID_USER");
@@ -69,7 +101,7 @@ function update_user_password($user_id, $new_password) {
         $request->bindParam(":password", $hashed);
         $request->bindParam(":id", $user_id);
         $request->execute();
-
+        add_logs($user_id,"psw changed");
         if ($request->rowCount() === 0) {
             return "error:not_found_or_no_change";
         }
@@ -110,6 +142,7 @@ function update_user_identifiant($user_id, $new_identifiant) {
         if ($request->rowCount() === 0) {
             return "error:not_found_or_no_change";
         }
+        add_logs($user_id,"identifiant changed");
         return "success";
     } catch (Exception $e) {
         error_log("[update_user_identifiant] Exception: " . $e->getMessage());

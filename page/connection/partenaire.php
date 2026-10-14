@@ -58,6 +58,7 @@ if (isset($_SESSION["token"])) {
                 <button type="submit" class="btn-primary">Connexion</button>
             </form>
             <p class="text-center">
+                <a class="text-sm mt-3 text-center" href="/connection/support">Un problème ? Contactez le support</a>
             </p>
         </div>
     </div>

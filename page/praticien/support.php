@@ -46,6 +46,9 @@ $TITLE = "Quotidio Planning - Praticien";
                 <p>Autres pages:</p>
                 <p class="flex"><a class="mr-2" target="_blank" href="/page/help/convention">Convention</a></p>
                 <br>
+                <p>Créer par Yanis Roca--Boyer avec ❤️</p>
+                <p>© 2026 Quotidio. Tous droits réservés.</p>
+                <br>
             </div>
         </div>
     </div>

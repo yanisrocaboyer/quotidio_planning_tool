@@ -42,6 +42,9 @@ $TITLE = "Quotidio Planning - Partenaire";
                     'name' => isset($client_user["name"]) ? $client_user["name"] : '',
                 ));
                 ?>
+                <p>Créer par Yanis Roca--Boyer avec ❤️</p>
+                <p>© 2026 Quotidio. Tous droits réservés.</p>
+                <br>
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@ $TITLE = "Quotidio Planning";
             <a class="btn-primary" href="/connection/praticien"><button>Je suis un·e praticien·ne</button></a>
             <a class="btn-primary" href="/connection/partenaire"><button>Je suis un partenaire</button></a>
             <a class="btn-primary" href="/connection/admin"><button>Connexion administrateur</button></a>
+            <a class="text-sm mt-3" href="/connection/support">Un problème ? Contactez le support</a>
         </div>
     </div>
 </div>

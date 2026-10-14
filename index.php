@@ -12,7 +12,6 @@ try {
     exit("Erreur de configuration du serveur.");
 }
 
-# Configuration des erreurs (les erreurs ne sont affichés qu'en mode debug)
 $app_debug = filter_var($_ENV["APP_DEBUG"] ?? false, FILTER_VALIDATE_BOOLEAN);
 if ($app_debug) {
     ini_set('display_errors', '1');
@@ -25,10 +24,6 @@ if ($app_debug) {
     error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 }
 
-# Durcissement des cookies de session
-#   httponly  : le cookie n'est pas accessible depuis le JavaScript
-#   samesite  : protège contre la plupart des CSRF
-#   secure    : activé uniquement en HTTPS
 if (PHP_SESSION_ACTIVE !== session_status()) {
     session_set_cookie_params([
         "lifetime" => 0,
@@ -43,7 +38,6 @@ session_start();
 
 require_once __DIR__ . '/functions/security.php';
 
-# En-têtes de sécurité
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: same-origin");
 header("X-Frame-Options: SAMEORIGIN");
@@ -51,9 +45,6 @@ $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTT
 
 $base_url = "";
 
-// Mail Config
-
-// Default values
 $layout = './layout/default.php';
 $maintenance = false;
 
