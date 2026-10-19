@@ -32,6 +32,7 @@ $bg_img = $is_october ? '/assets/bg-october.png' : '/assets/bg.png';
        
         ?>   
     </main>
+    <?php include 'components/mobile/nav.php'; ?>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         function getRowCards(card) {

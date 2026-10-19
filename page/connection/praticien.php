@@ -2,6 +2,8 @@
 $TITLE = "Quotidio Planning - Connexion";
 require_once './functions/connection.php';
 
+$sidebar = isset($_GET['sidebar']) ? $_GET['sidebar'] : 0;
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     csrf_check();
 
@@ -26,6 +28,16 @@ if (isset($_SESSION["token"])) {
     exit();
 }
 
+?>
+<?php
+if (isset($_GET["sidebar"]) && $_GET["sidebar"]=="1"){
+?>
+<div class="dashboard">
+<div class="dashboard-content">
+<?php include 'components/connection/sidebar.php' ?> 
+<div class="mt-auto mb-auto ml-auto mr-auto">
+<?php
+}
 ?>
 <div class="center-box">
     <div class="con-box-1">
@@ -59,8 +71,18 @@ if (isset($_SESSION["token"])) {
             </form>
             <a href="./praticien_register" class="refresh"><p class="text-center">Pas de compte ? Inscrivez vous</p></a><br>
             <p class="text-center">
-                <a class="text-sm mt-3 text-center" href="/connection/support">Un problème ? Contactez le support</a>
+                <a class="text-sm mt-3 text-center" href="/connection/support?sidebar=<?= $sidebar ?>">Un problème ? Contactez le support</a>
             </p>
         </div>
     </div>
 </div>
+
+<?php
+if (isset($_GET["sidebar"]) && $_GET["sidebar"]=="1"){
+?>
+</div>
+</div>
+</div>
+<?php
+}
+?>

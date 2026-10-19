@@ -163,17 +163,172 @@
     @apply text-white
 }
 
-/* Responsive Dashboard */
+/* ===== Shell mobile (téléphones + tablettes) ===== */
 
-@media (max-width: 640px) {
-    .dashboard-content {
-        @apply flex-col w-full h-full rounded-none;
+.mobile-topbar,
+.mobile-tabbar,
+.sidebar-backdrop,
+.sidebar-close {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    /* Barre d'application haute */
+    .mobile-topbar {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 60;
+        align-items: center;
+        gap: 0.25rem;
+        height: calc(3.5rem + env(safe-area-inset-top));
+        padding: env(safe-area-inset-top) 0.75rem 0 0.75rem;
+        background: rgba(255, 255, 255, 0.92);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 1px 0 rgba(23, 54, 93, 0.08), 0 8px 24px -18px rgba(23, 54, 93, 0.5);
     }
+
+    .mobile-topbar-btn {
+        @apply flex items-center justify-center w-10 h-10 rounded-full text-primary select-none;
+    }
+    .mobile-topbar-btn:active {
+        @apply bg-black/5;
+    }
+    .mobile-topbar-btn .material-symbols-outlined {
+        @apply text-2xl;
+    }
+
+    .mobile-topbar-btn.active {
+        @apply bg-black/5;
+    }
+
+    .mobile-brand {
+        @apply ml-1 text-lg font-bold tracking-tight text-primary;
+    }
+
+    .mobile-topbar-actions {
+        @apply ml-auto flex items-center gap-0.5;
+    }
+
+    .mobile-avatar {
+        @apply flex items-center justify-center w-9 h-9 rounded-full bg-primary text-white text-sm font-semibold select-none;
+    }
+
+    /* Barre de navigation basse */
+    .mobile-tabbar {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 60;
+        align-items: stretch;
+        justify-content: space-around;
+        padding-bottom: env(safe-area-inset-bottom);
+        background: rgba(255, 255, 255, 0.94);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(23, 54, 93, 0.1);
+        box-shadow: 0 -6px 24px -18px rgba(23, 54, 93, 0.6);
+    }
+    .mobile-tabbar a {
+        @apply flex flex-1 flex-col items-center justify-center gap-0.5 py-1.5 text-[11px] font-medium leading-none text-secondary;
+    }
+    .mobile-tabbar a .material-symbols-outlined {
+        @apply text-2xl;
+    }
+    .mobile-tabbar a.active {
+        @apply font-semibold text-primary;
+    }
+
+    /* La sidebar existante devient un tiroir (drawer) */
     .side-bar {
-        @apply w-full min-w-0 max-w-full rounded-l-none rounded-t-lg;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 70;
+        width: 84%;
+        max-width: 330px;
+        min-width: 0;
+        height: 100dvh;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        border-radius: 0 1.25rem 1.25rem 0;
+        box-shadow: 0 0 60px rgba(15, 23, 42, 0.35);
+        transform: translateX(-108%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+    }
+    body.sidebar-open .side-bar {
+        transform: translateX(0);
+    }
+
+    .sidebar-close {
+        @apply absolute top-2 right-2 z-10 flex items-center justify-center w-9 h-9 rounded-full text-secondary;
+    }
+    .sidebar-close:active {
+        @apply bg-black/5;
+    }
+    .sidebar-close .material-symbols-outlined {
+        @apply text-2xl;
+    }
+
+    .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 65;
+        background: rgba(15, 23, 42, 0.45);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    body.sidebar-open .sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    body.sidebar-open {
+        overflow: hidden;
+    }
+
+    /* Le dashboard se place sous la barre haute et au-dessus de la barre basse */
+    .dashboard {
+        @apply items-stretch;
+        min-height: 100dvh;
+        overflow: visible;
+        padding-top: calc(3.5rem + env(safe-area-inset-top));
+        padding-bottom: calc(3.9rem + env(safe-area-inset-bottom));
+    }
+    .dashboard-content {
+        @apply flex-col w-full h-auto min-h-0 rounded-none;
     }
     .content {
-        @apply w-full ml-0 rounded-lg rounded-t-none mt-0 mb-0;
+        @apply w-full h-auto ml-0 mr-0 mt-0 mb-0 rounded-none;
+        overflow: visible;
+    }
+    .content-2 {
+        @apply w-full h-auto ml-0 mr-0 mt-0 mb-0 rounded-none;
+        overflow: visible;
+    }
+
+    /* Grilles plus lisibles sur mobile */
+    .content .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Popups plein écran */
+    .popup {
+        @apply fixed z-[100];
+    }
+    .popup-frame {
+        @apply p-5 max-w-[92vw];
     }
 }
 
