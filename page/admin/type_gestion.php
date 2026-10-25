@@ -16,20 +16,23 @@ $successMsg = '';
 $errorMsg = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    csrf_check();
-    if (isset($_POST["add_type_submit"])) {
-        $type_name = trim($_POST["add_type_input"]);
-        if (!empty($type_name)) {
-            add_atelier_type($type_name);
-            $successMsg = "Type ajouté avec succès.";
-        } else {
-            $errorMsg = "Le nom du type ne peut pas être vide.";
+    try {
+        if (isset($_POST["add_type_submit"])) {
+            $type_name = trim($_POST["add_type_input"]);
+            if (!empty($type_name)) {
+                add_atelier_type($type_name);
+                $successMsg = "Type ajouté avec succès.";
+            } else {
+                $errorMsg = "Le nom du type ne peut pas être vide.";
+            }
         }
-    }
-    if (isset($_POST["delete_type_submit"], $_POST["type_to_delete"])) {
-        $type_name = $_POST["type_to_delete"];
-        delete_atelier_type($type_name);
-        $successMsg = "Type supprimé avec succès.";
+        if (isset($_POST["delete_type_submit"], $_POST["type_to_delete"])) {
+            $type_name = $_POST["type_to_delete"];
+            delete_atelier_type($type_name);
+            $successMsg = "Type supprimé avec succès.";
+        }
+    } catch (Exception $e) {
+        $errorMsg = "Une erreur est survenue : " . htmlspecialchars($e->getMessage());
     }
 }
 
