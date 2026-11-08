@@ -69,13 +69,13 @@ $TITLE = "Quotidio Planning - Admin";
                 ?>
                 <?php
                 if (get_flash("client_password") !== null) {
-                    echo "<p class='text-green-900'>Création du établissement de santé avec succès !</p>";
-                    echo "<p class='text-green-900'>Mot de passe du établissement de santé: " . h(get_flash("client_password")) . "</p>";
+                    echo "<p class='text-green-900'>Création de l'établissement de santé avec succès !</p>";
+                    echo "<p class='text-green-900'>Mot de passe de l'établissement de santé: " . h(get_flash("client_password")) . "</p>";
                 }
                 if(isset($_GET["error"])){
                     if ($_GET["error"] == "success"){
                     ?>
-                    <p class="text-green-900">Création du établissement de santé avec succès !</p>
+                    <p class="text-green-900">Création de l'établissement de santé avec succès !</p>
                     <?php
                     }
                     else {
