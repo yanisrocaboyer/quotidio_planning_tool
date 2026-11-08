@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <div class="mt-3">
                                 <label for="adressInput">Commentaire :</label>
-                                <input type="text" id="noteInput" name="noteInput" class="w-100" value="<?php echo $client['note'] ?>">
+                                <input type="text" id="noteInput" name="noteInput" class="w-200" value="<?php echo $client['note'] ?>">
                             </div>
                             <button class="mt-2 underline" type="submit">Modifier les informations</button>
                         </form>
