@@ -44,7 +44,7 @@ if (isset($_GET["sidebar"]) && $_GET["sidebar"]=="1"){
     <div class="con-box-1">
         <img class="w-80 ml-auto mr-auto" src="/assets/quotidio_big_logo.png" alt="quotidio_big_logo" draggable="false">
         <div>
-            <h1 class="mt-2 text-2xl text-center text-primary">Connexion partenaire</h1>
+            <h1 class="mt-2 text-2xl text-center text-primary">Connexion établissement de santé</h1>
             <?php
             if (isset($_GET["err"])) {
                 if ($_GET["err"] === "INVALID_USER") {

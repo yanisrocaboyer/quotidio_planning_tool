@@ -73,12 +73,12 @@ if (isset($_GET["action"]) && $_GET["action"] == "set_all_creation_atelier_to_pe
                             </div>
                        
                             <div class="mt-5">
-                                <p>Partenaire</p>
+                                <p>Établissement de santé</p>
                                 <?php
                                     $clients = get_clients();
                                 ?>
                                 <select class="input-primary" name="clientInput" required>
-                                    <option value="">Sélectionner un partenaire</option>
+                                    <option value="">Sélectionner un établissement de santé</option>
                                     <?php foreach ($clients as $client): ?>
                                         <option value="<?= htmlspecialchars($client['id']) ?>">
                                             <?= htmlspecialchars($client['name']) ?>

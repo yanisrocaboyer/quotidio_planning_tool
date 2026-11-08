@@ -48,8 +48,8 @@ $mobile_tabs = array();
 if ($mobile_role === 'admin') {
     $mobile_tabs = array(
         array('Ateliers', '/admin/index', 'calendar_today'),
-        array('Partenaires', '/admin/client_gestion', 'partner_exchange'),
-        array('Praticiens', '/admin/praticien_gestion', 'badge'),
+        array('Établissements de santé', '/admin/client_gestion', 'partner_exchange'),
+        array('Partenaires', '/admin/praticien_gestion', 'badge'),
         array('Types', '/admin/type_gestion', 'category'),
     );
 } elseif ($mobile_role === 'praticien') {

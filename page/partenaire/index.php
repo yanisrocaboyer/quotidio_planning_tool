@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-$TITLE = "Quotidio Planning - Partenaire";
+$TITLE = "Quotidio Planning - Établissement de santé";
 ?>
 <div class="dashboard">
     <div class="dashboard-content">

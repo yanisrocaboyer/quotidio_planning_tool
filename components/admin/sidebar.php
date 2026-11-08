@@ -35,13 +35,13 @@
         <div>
             <a href="/admin/client_gestion" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">account_circle</span>
-                <p class="ml-1">Gestion des partenaires</p>
+                <p class="ml-1">Gestion des établissements de santé</p>
             </a>
         </div>
         <div>
             <a href="/admin/praticien_gestion" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">identity_platform</span>
-                <p class="ml-1">Gestion des praticiens</p>
+                <p class="ml-1">Gestion des partenaires</p>
             </a>
         </div>
     </div>

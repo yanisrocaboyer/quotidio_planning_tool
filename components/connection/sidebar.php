@@ -18,7 +18,7 @@ $sidebar = isset($_GET['sidebar']) ? $_GET['sidebar'] : 0;
         <div>
             <a href="/connection/partenaire?sidebar=<?= $sidebar ?>" class="flex items-center mt-2 text-primary hover:text-secondary">
                 <span class="material-symbols-outlined">home_health</span>
-                <p class="ml-1">Etablissement de santé</p>
+                <p class="ml-1">Établissement de santé</p>
             </a>
         </div>
         <div>

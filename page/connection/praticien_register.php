@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="bg-white w-full max-w-3xl shadow-lg px-10 py-8 mx-2 overflow-auto sm:rounded-xl">
         <img class="w-64 md:w-80 mx-auto" src="/assets/quotidio_big_logo.png" alt="quotidio_big_logo" draggable="false">
         <div class="mt-4">
-            <h1 class="mt-2 text-3xl md:text-4xl text-center text-primary">Inscription praticien·ne</h1>
+            <h1 class="mt-2 text-3xl md:text-4xl text-center text-primary">Inscription partenaire</h1>
             <div id="form-global-error" class="text-center text-red-700 text-sm mb-2">
                 <?php 
                 if (!empty($form_errors)) {
