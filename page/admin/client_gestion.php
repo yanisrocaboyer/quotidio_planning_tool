@@ -30,7 +30,7 @@ $TITLE = "Quotidio Planning - Admin";
             <div style="display: none" class="popup" id="createClientPopup">
                 <div class="popup-frame">
                     <div class="popup-content">
-                        <h1 class="text-center">Ajouter un partenaire</h1>
+                        <h1 class="text-center">Ajouter un établissement de santé</h1>
                         <form method="POST">
                             <?= csrf_field() ?>
                             <div class="mt-5">
@@ -57,7 +57,7 @@ $TITLE = "Quotidio Planning - Admin";
             </div>
             <div class="ml-5 mt-5">
                 <div class="flex">
-                    <h1 class="text-2xl">Gestions des partenaires</h1>
+                    <h1 class="text-2xl">Gestions des établissements de santé</h1>
                     <button class="ml-auto mr-5 bg-black text-white p-2 rounded-4xl" id="createClientBtn"><span class="material-symbols-outlined">add</span></button>
                 </div>
                 <?php
@@ -69,13 +69,13 @@ $TITLE = "Quotidio Planning - Admin";
                 ?>
                 <?php
                 if (get_flash("client_password") !== null) {
-                    echo "<p class='text-green-900'>Création du partenaire avec succès !</p>";
-                    echo "<p class='text-green-900'>Mot de passe du partenaire: " . h(get_flash("client_password")) . "</p>";
+                    echo "<p class='text-green-900'>Création du établissement de santé avec succès !</p>";
+                    echo "<p class='text-green-900'>Mot de passe du établissement de santé: " . h(get_flash("client_password")) . "</p>";
                 }
                 if(isset($_GET["error"])){
                     if ($_GET["error"] == "success"){
                     ?>
-                    <p class="text-green-900">Création du partenaire avec succès !</p>
+                    <p class="text-green-900">Création du établissement de santé avec succès !</p>
                     <?php
                     }
                     else {
@@ -85,7 +85,7 @@ $TITLE = "Quotidio Planning - Admin";
                     }
                 }
                 ?>
-                <h2 class="mt-2 mb-2">Liste des partenaires</h2>
+                <h2 class="mt-2 mb-2">Liste des établissements de santé</h2>
                 <?php
                 $clients = get_clients();
                 if (!empty($clients)) {
