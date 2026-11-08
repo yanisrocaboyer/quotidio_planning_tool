@@ -50,16 +50,16 @@ function render_atelier_filters($section, $options = array()) {
     ?>
     <div class="atelier-filters flex flex-wrap gap-2 items-center ml-2">
         <?php if (!empty($praticiens)): ?>
-            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="praticien" title="Filtrer par praticien">
-                <option value="">Praticien : tous</option>
+            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="praticien" title="Filtrer par partenaire">
+                <option value="">Partenaire : tous</option>
                 <?php foreach ($praticiens as $p): ?>
                     <option value="<?= htmlspecialchars($p['id']) ?>"><?= htmlspecialchars($p['name'] . ' ' . $p['surname']) ?></option>
                 <?php endforeach; ?>
             </select>
         <?php endif; ?>
         <?php if (!empty($clients)): ?>
-            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="client" title="Filtrer par partenaire">
-                <option value="">Partenaire : tous</option>
+            <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="client" title="Filtrer par établissement de santé">
+                <option value="">établissement de santé : tous</option>
                 <?php foreach ($clients as $c): ?>
                     <option value="<?= htmlspecialchars($c['id']) ?>"><?= htmlspecialchars($c['name']) ?></option>
                 <?php endforeach; ?>
