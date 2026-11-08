@@ -137,9 +137,9 @@ if ($atelier) {
                             </select>
                         </div>
                         <div>
-                            <label for="praticienInput">Praticien:</label>
+                            <label for="praticienInput">Partenaire :</label>
                             <select name="praticienInput" id="praticienInput">
-                                <option value="" disabled selected>Sélectionner un praticien</option>
+                                <option value="" disabled selected>Sélectionner un partenaire</option>
                                 <?php
                                 $praticiens = get_praticiens("validate");
                                 $selected_praticien_id = isset($atelier['praticien_id']) ? $atelier['praticien_id'] : null;
