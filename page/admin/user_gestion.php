@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if ($type == "praticien"){
                     $praticien = get_praticien($user_id);
                     if ($praticien["id"] == NULL) {
-                        echo "<p>Praticien inconnu</p>";
+                        echo "<p>Partenaire inconnu</p>";
                     } else {
                     $praticien_id = $praticien["id"];
                     ?>
