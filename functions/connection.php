@@ -240,7 +240,7 @@ function register($post, $files) {
 
         $praticien_id = $sql->lastInsertId();
         if (!$praticien_id) {
-            $msg = "Erreur lors de la création du praticien.";
+            $msg = "Erreur lors de la création du partenaire.";
             error_log("[register] $msg");
             $response['errors'][] = $msg;
             return $response;
@@ -278,7 +278,7 @@ function register($post, $files) {
 
                     $html = '
                     <h1>Bonjour ' . htmlspecialchars($surname, ENT_QUOTES, 'UTF-8') . ' ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ',</h1>
-                    <p>Nous vous informons que votre inscription en tant que praticien de Quotidio a bien été prise en compte.</p>
+                    <p>Nous vous informons que votre inscription en tant que partenaire de Quotidio a bien été prise en compte.</p>
                     <p>Nous vous donnerons un retour concernant votre inscription dans les plus brefs délais.</p>
                     ';
                     send_mail($email, htmlspecialchars("Votre inscription a bien été prise en compte !"), $html, strip_tags($html));            
@@ -400,12 +400,12 @@ function create_client_user($id) {
 
         $html = '
         <h1>Bonjour ' . htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8') . ',</h1>
-        <p>Nous vous informons que votre compte partenaire a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
+        <p>Nous vous informons que votre compte établissement de santé a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
         <p>Identifiant : ' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</p>
         <p>Mot de passe : ' . htmlspecialchars($password, ENT_QUOTES, 'UTF-8') . '</p>
         <p>Pour vous connecter à votre compte, rendez-vous sur <a href="https://quotidio.fr/connection/partenaire">https://quotidio.fr/connection/partenaire</a>.</p>
         ';
-        send_mail($email, htmlspecialchars("Votre compte partenaire a été créé !"), $html, strip_tags($html));
+        send_mail($email, htmlspecialchars("Votre compte établissement de santé a été créé !"), $html, strip_tags($html));
    
         return $password;
     } catch (Exception $e) {
@@ -580,12 +580,12 @@ function set_praticien_to_valide($id) {
 
         $html = '
         <h1>Bonjour ' . htmlspecialchars($praticien["surname"], ENT_QUOTES, 'UTF-8') . ' ' . htmlspecialchars($praticien["name"], ENT_QUOTES, 'UTF-8') . ',</h1>
-        <p>Nous vous informons que votre compte praticien a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
+        <p>Nous vous informons que votre compte partenaire a bien été créé. Vous pouvez retrouver vos identifiants ci-dessous :</p>
         <p>Identifiant : ' . htmlspecialchars($praticien["email"], ENT_QUOTES, 'UTF-8') . '</p>
         <p>Mot de passe : ' . htmlspecialchars($password, ENT_QUOTES, 'UTF-8') . '</p>
         <p>Pour vous connecter à votre compte, rendez-vous sur <a href="https://quotidio.fr/connection/praticien">https://quotidio.fr/connection/praticien</a>.</p>
         ';
-        send_mail($praticien["email"], htmlspecialchars("Votre compte praticien a été créé !"), $html, strip_tags($html));   
+        send_mail($praticien["email"], htmlspecialchars("Votre compte partenaire a été créé !"), $html, strip_tags($html));   
 
         return $password;
     } catch (Exception $e) {
