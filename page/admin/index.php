@@ -195,6 +195,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "set_all_creation_atelier_to_pe
 ?>
 
 <script>
+(() => {
 const popupAtelier = document.getElementById("createAtelierPopup");
 const createAtelierBtn = document.getElementById("createAtelierBtn");
 const popupFrame = document.querySelector(".popup-frame");
@@ -217,4 +218,5 @@ if (cancelBtn) {
 popupAtelier.querySelector(".popup-frame").addEventListener("click", (event) => {
     event.stopPropagation();
 });
+})();
 </script>
