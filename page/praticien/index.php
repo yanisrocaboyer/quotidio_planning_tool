@@ -12,7 +12,7 @@ if (!isset($_SESSION["token"]) || empty($_SESSION["token"]) || !$access || $acce
 $praticien_user = get_praticien($user['user_id']);
 global $adminTok, $adminId;
 
-$TITLE = "Quotidio Planning - Praticien";
+$TITLE = "Quotidio Planning - Partenaire";
 
 if (isset($_GET['act']) && isset($_GET['atelier_id'])) {
     $atelier_id = $_GET['atelier_id'];
