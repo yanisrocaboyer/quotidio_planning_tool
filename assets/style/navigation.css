@@ -1,0 +1,34 @@
+/* Transitions de navigation — palette Quotidio */
+#quotidio-loading-bar {
+  position: fixed; inset: 0 auto auto 0; width: 0; height: 3px;
+  z-index: 10002; pointer-events: none;
+  background: linear-gradient(90deg, #73c5be, #45667d, #17365d);
+  box-shadow: 0 0 12px rgba(69,102,125,.3);
+  transition: width .2s ease-out;
+}
+#quotidio-loading {
+  position: fixed; inset: 0; z-index: 10001;
+  display: grid; place-items: center; pointer-events: none;
+  background: rgba(214,234,231,.18);
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+  opacity: 0; transition: opacity .18s ease;
+}
+#quotidio-loading[hidden] { display: none; }
+.quotidio-is-loading #quotidio-loading { opacity: 1; }
+.quotidio-loading-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 20px; border: 1px solid rgba(115,197,190,.4);
+  border-radius: 16px; background: rgba(255,255,255,.9);
+  box-shadow: 0 12px 36px rgba(23,54,93,.12);
+  color: #17365d; font: 600 14px/1.3 system-ui,sans-serif;
+}
+.quotidio-spinner {
+  width: 23px; height: 23px; border: 3px solid #d6eae7;
+  border-top-color: #45667d; border-right-color: #73c5be;
+  border-radius: 50%; animation: quotidio-spin .75s linear infinite;
+}
+@keyframes quotidio-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  #quotidio-loading, #quotidio-loading-bar { transition: none; }
+  .quotidio-spinner { animation-duration: 2s; }
+}
