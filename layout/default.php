@@ -15,9 +15,17 @@ $bg_img = $is_october ? '/assets/bg-october.png' : '/assets/bg.png';
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="/assets/style/<?php echo $css_file; ?>?v=<?php echo filemtime('assets/style/' . $css_file); ?>">
+    <link rel="stylesheet" href="/assets/style/navigation.css?v=1">
     <title><?php echo $TITLE; ?></title>
 </head>
 <body style="background-image: url('<?php echo $bg_img; ?>')" class="bg-no-repeat bg-bottom bg-cover">
+    <div id="quotidio-loading-bar" aria-hidden="true"></div>
+    <div id="quotidio-loading" hidden aria-hidden="true">
+        <div class="quotidio-loading-card" role="status" aria-live="polite">
+            <span class="quotidio-spinner" aria-hidden="true"></span>
+            <span>Chargement de la page…</span>
+        </div>
+    </div>
     <main id="content">
         <?php 
             if (isset($page_content)) {
@@ -88,5 +96,6 @@ $bg_img = $is_october ? '/assets/bg-october.png' : '/assets/bg.png';
         });
     });
     </script>
+    <script src="/assets/js/navigation.js?v=1" defer></script>
 </body>
 </html>
