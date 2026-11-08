@@ -16,14 +16,14 @@ $TITLE = "Quotidio Planning - Admin";
         <div class="content">
             <div class="ml-5 mt-5">
                 <div class="flex">
-                    <h1 class="text-2xl">Gestions des praticien·ne·s</h1>
+                    <h1 class="text-2xl">Gestions des partenaires</h1>
                 </div>
                 <?php
                 if (isset($_GET["msg"]) && $_GET["msg"]) {
                     echo "<p class='success'>Compte supprimer avec succès !</p>";
                 }
                 ?>
-                <h2 class="mt-2 mb-2">Praticien·ne·s en attente de validation</h2>
+                <h2 class="mt-2 mb-2">Partenaires en attente de validation</h2>
                 <?php
                 $pending_praticiens = get_praticiens("pending");
                 foreach($pending_praticiens as $praticien) {
@@ -45,7 +45,7 @@ $TITLE = "Quotidio Planning - Admin";
                     echo "<p>Aucun</p>";
                 }
                 ?>
-                <h2 class="mt-2 mb-2">Praticien·ne·s adhérents</h2>
+                <h2 class="mt-2 mb-2">Partenaires adhérents</h2>
                 <?php
                 $valide_praticiens = get_praticiens("validate");
                 foreach($valide_praticiens as $praticien) {
@@ -67,7 +67,7 @@ $TITLE = "Quotidio Planning - Admin";
                     echo "<p>Aucun</p>";
                 }
                 ?>
-                <h2 class="mt-2 mb-2">Praticien·ne·s refusés/supprimés</h2>
+                <h2 class="mt-2 mb-2">Partenaires refusés/supprimés</h2>
                 <?php
                 $refuse_praticien = get_praticiens("refuse");
                 foreach($refuse_praticien as $praticien) {
