@@ -59,7 +59,7 @@ function render_atelier_filters($section, $options = array()) {
         <?php endif; ?>
         <?php if (!empty($clients)): ?>
             <select class="input-filter atelier-filter-select" data-section="<?= $section ?>" data-filter="client" title="Filtrer par établissement de santé">
-                <option value="">établissement de santé : tous</option>
+                <option value="">Établissement de santé : tous</option>
                 <?php foreach ($clients as $c): ?>
                     <option value="<?= htmlspecialchars($c['id']) ?>"><?= htmlspecialchars($c['name']) ?></option>
                 <?php endforeach; ?>
