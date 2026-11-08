@@ -117,6 +117,7 @@ $TITLE = "Quotidio Planning - Admin";
 ?>
 
 <script>
+(() => {
 const popupClient = document.getElementById("createClientPopup");
 const createClientBtn = document.getElementById("createClientBtn");
 const cancelBtn = document.getElementById("cancelBtn");
@@ -138,4 +139,5 @@ if (cancelBtn) {
 popupClient.querySelector(".popup-frame").addEventListener("click", (event) => {
     event.stopPropagation();
 });
+})();
 </script>
