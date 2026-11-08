@@ -93,7 +93,7 @@ function atelier_actions_admin($atelier) {
     <div class="mt-2">
         <h3><b>Actions :</b></h3>
         <?php if ($atelier["state"] == 'creation') { ?>
-            <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Ouvrir les candidatures pour les praticiens</a><br>
+            <a href="?action=setStateOpen&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Ouvrir les candidatures pour les partenaires</a><br>
             <div class="flex">
                 <a href="?action=setStateValidate&id=<?php echo $atelier['id'] ?>&<?= csrf_query() ?>">Valider l'atelier</a><br>
                 <?php
